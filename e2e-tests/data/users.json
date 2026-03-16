@@ -1,0 +1,29 @@
+{
+  "doctor": {
+    "default": { "username": "doctor01", "password": "Test@1234" },
+    "workers": [
+      { "username": "doctor_w1", "password": "Test@1234", "workerIndex": 0 },
+      { "username": "doctor_w2", "password": "Test@1234", "workerIndex": 1 },
+      { "username": "doctor_w3", "password": "Test@1234", "workerIndex": 2 },
+      { "username": "doctor_w4", "password": "Test@1234", "workerIndex": 3 }
+    ]
+  },
+  "auditor": {
+    "default": { "username": "auditor01", "password": "Test@1234" },
+    "workers": [
+      { "username": "auditor_w1", "password": "Test@1234", "workerIndex": 0 },
+      { "username": "auditor_w2", "password": "Test@1234", "workerIndex": 1 },
+      { "username": "auditor_w3", "password": "Test@1234", "workerIndex": 2 },
+      { "username": "auditor_w4", "password": "Test@1234", "workerIndex": 3 }
+    ]
+  },
+  "admin": {
+    "default": { "username": "admin01", "password": "Test@1234" },
+    "workers": [
+      { "username": "admin_w1", "password": "Test@1234", "workerIndex": 0 },
+      { "username": "admin_w2", "password": "Test@1234", "workerIndex": 1 },
+      { "username": "admin_w3", "password": "Test@1234", "workerIndex": 2 },
+      { "username": "admin_w4", "password": "Test@1234", "workerIndex": 3 }
+    ]
+  }
+}

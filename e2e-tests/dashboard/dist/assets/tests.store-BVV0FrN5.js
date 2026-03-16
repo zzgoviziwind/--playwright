@@ -1,0 +1,1 @@
+import{q as f,n as t}from"./index-BjR7_M2q.js";const r=f("tests",()=>{const n=t([]),s=t(null),o=t(""),l=t(!1);function i(e){n.value=e}function c(e){s.value=e}function u(e){o.value=e}return{files:n,selectedFile:s,fileContent:o,loading:l,setFiles:i,selectFile:c,setFileContent:u}});export{r as u};

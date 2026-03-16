@@ -1,0 +1,58 @@
+pipeline {
+    agent {
+        docker {
+            image 'mcr.microsoft.com/playwright:v1.50.0-jammy'
+        }
+    }
+
+    environment {
+        BASE_URL = "http://test-server:8080"
+    }
+
+    stages {
+        stage('Install') {
+            steps {
+                dir('e2e-tests') {
+                    sh 'pnpm install --frozen-lockfile'
+                }
+            }
+        }
+
+        stage('Smoke Test') {
+            steps {
+                dir('e2e-tests') {
+                    sh 'npx playwright test --project=smoke-chromium'
+                }
+            }
+        }
+
+        stage('Regression Test') {
+            when {
+                branch 'main'
+            }
+            steps {
+                dir('e2e-tests') {
+                    sh 'npx playwright test --project=regression-chromium --project=regression-firefox'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            publishHTML(target: [
+                reportDir: 'e2e-tests/playwright-report',
+                reportFiles: 'index.html',
+                reportName: 'Playwright Report'
+            ])
+            archiveArtifacts artifacts: 'e2e-tests/test-results/**', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'e2e-tests/results/**', allowEmptyArchive: true
+        }
+        failure {
+            script {
+                echo "E2E 测试失败: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+                // 可在此处添加钉钉/企业微信通知
+            }
+        }
+    }
+}

@@ -1,0 +1,92 @@
+[
+  {
+    "code": "blood_pressure",
+    "name": "血压",
+    "unit": "mmHg",
+    "normalRange": "90/60-140/90",
+    "inputType": "text",
+    "required": true,
+    "sampleNormal": "120/80",
+    "sampleAbnormal": "180/120"
+  },
+  {
+    "code": "heart_rate",
+    "name": "心率",
+    "unit": "次/分",
+    "normalRange": "60-100",
+    "inputType": "number",
+    "required": true,
+    "sampleNormal": "72",
+    "sampleAbnormal": "500"
+  },
+  {
+    "code": "blood_sugar",
+    "name": "血糖(空腹)",
+    "unit": "mmol/L",
+    "normalRange": "3.9-6.1",
+    "inputType": "number",
+    "required": true,
+    "sampleNormal": "5.6",
+    "sampleAbnormal": "15.0"
+  },
+  {
+    "code": "hemoglobin",
+    "name": "血红蛋白",
+    "unit": "g/L",
+    "normalRange": "120-160",
+    "inputType": "number",
+    "required": false,
+    "sampleNormal": "140",
+    "sampleAbnormal": "60"
+  },
+  {
+    "code": "white_blood_cell",
+    "name": "白细胞",
+    "unit": "×10⁹/L",
+    "normalRange": "4.0-10.0",
+    "inputType": "number",
+    "required": false,
+    "sampleNormal": "6.5",
+    "sampleAbnormal": "25.0"
+  },
+  {
+    "code": "platelet",
+    "name": "血小板",
+    "unit": "×10⁹/L",
+    "normalRange": "100-300",
+    "inputType": "number",
+    "required": false,
+    "sampleNormal": "200",
+    "sampleAbnormal": "50"
+  },
+  {
+    "code": "alt",
+    "name": "谷丙转氨酶",
+    "unit": "U/L",
+    "normalRange": "0-40",
+    "inputType": "number",
+    "required": false,
+    "sampleNormal": "25",
+    "sampleAbnormal": "120"
+  },
+  {
+    "code": "creatinine",
+    "name": "肌酐",
+    "unit": "μmol/L",
+    "normalRange": "44-133",
+    "inputType": "number",
+    "required": false,
+    "sampleNormal": "80",
+    "sampleAbnormal": "300"
+  },
+  {
+    "code": "doctor_comment",
+    "name": "医生建议",
+    "unit": "",
+    "normalRange": "",
+    "inputType": "textarea",
+    "required": false,
+    "sampleNormal": "各项指标正常，建议保持良好生活习惯",
+    "sampleAbnormal": ""
+  }
+]

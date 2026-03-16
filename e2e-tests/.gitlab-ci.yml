@@ -1,0 +1,66 @@
+stages:
+  - build
+  - deploy-test
+  - smoke-test
+  - regression-test
+  - report
+
+variables:
+  BASE_URL: "http://test-server:8080"
+
+# 冒烟测试
+smoke-test:
+  stage: smoke-test
+  image: mcr.microsoft.com/playwright:v1.50.0-jammy
+  script:
+    - cd e2e-tests
+    - pnpm install --frozen-lockfile
+    - npx playwright test --project=smoke-chromium
+  artifacts:
+    when: always
+    paths:
+      - e2e-tests/playwright-report/
+      - e2e-tests/test-results/
+      - e2e-tests/results/
+    expire_in: 7 days
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+# 回归测试
+regression-test:
+  stage: regression-test
+  image: mcr.microsoft.com/playwright:v1.50.0-jammy
+  script:
+    - cd e2e-tests
+    - pnpm install --frozen-lockfile
+    - npx playwright test --project=regression-chromium --project=regression-firefox
+  artifacts:
+    when: always
+    paths:
+      - e2e-tests/playwright-report/
+      - e2e-tests/test-results/
+      - e2e-tests/results/
+    expire_in: 30 days
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  allow_failure: false
+
+# 测试报告归档与通知
+publish-report:
+  stage: report
+  script:
+    - echo "报告已归档到制品库"
+    # 发送通知（示例：企业微信 Webhook）
+    - |
+      if [ -n "$WECHAT_WEBHOOK_URL" ]; then
+        curl -X POST "$WECHAT_WEBHOOK_URL" \
+          -H 'Content-Type: application/json' \
+          -d "{
+            \"msgtype\": \"markdown\",
+            \"markdown\": {
+              \"content\": \"## E2E 测试报告\n> 分支：${CI_COMMIT_BRANCH}\n> 状态：${CI_JOB_STATUS}\n> [查看报告](${CI_JOB_URL}/artifacts/browse)\"
+            }
+          }"
+      fi
+  rules:
+    - when: always

@@ -1,0 +1,77 @@
+{
+  "smoke": {
+    "draftReport": {
+      "patientName": "冒烟测试患者",
+      "patientId": "SMOKE001",
+      "examDate": "2025-01-15",
+      "status": "draft",
+      "examItems": [
+        { "code": "blood_pressure", "name": "血压", "value": "", "unit": "mmHg" },
+        { "code": "heart_rate", "name": "心率", "value": "", "unit": "次/分" },
+        { "code": "blood_sugar", "name": "血糖", "value": "", "unit": "mmol/L" }
+      ]
+    },
+    "pendingAuditReport": {
+      "patientName": "审核测试患者",
+      "patientId": "SMOKE002",
+      "examDate": "2025-01-15",
+      "status": "pending_audit",
+      "examItems": [
+        { "code": "blood_pressure", "name": "血压", "value": "120/80", "unit": "mmHg" },
+        { "code": "heart_rate", "name": "心率", "value": "72", "unit": "次/分" },
+        { "code": "blood_sugar", "name": "血糖", "value": "5.6", "unit": "mmol/L" }
+      ],
+      "doctorComment": "各项指标正常"
+    }
+  },
+  "regression": {
+    "normalReport": {
+      "patientName": "回归测试患者A",
+      "patientId": "REG001",
+      "examDate": "2025-01-10",
+      "status": "draft",
+      "examItems": [
+        { "code": "blood_pressure", "name": "血压", "value": "118/75", "unit": "mmHg" },
+        { "code": "heart_rate", "name": "心率", "value": "68", "unit": "次/分" },
+        { "code": "blood_sugar", "name": "血糖", "value": "4.8", "unit": "mmol/L" }
+      ]
+    },
+    "abnormalReport": {
+      "patientName": "回归测试患者B",
+      "patientId": "REG002",
+      "examDate": "2025-01-11",
+      "status": "draft",
+      "examItems": [
+        { "code": "blood_pressure", "name": "血压", "value": "160/100", "unit": "mmHg" },
+        { "code": "heart_rate", "name": "心率", "value": "105", "unit": "次/分" },
+        { "code": "blood_sugar", "name": "血糖", "value": "8.5", "unit": "mmol/L" }
+      ]
+    },
+    "auditedReport": {
+      "patientName": "回归测试患者C",
+      "patientId": "REG003",
+      "examDate": "2025-01-12",
+      "status": "audited",
+      "examItems": [
+        { "code": "blood_pressure", "name": "血压", "value": "125/82", "unit": "mmHg" },
+        { "code": "heart_rate", "name": "心率", "value": "76", "unit": "次/分" },
+        { "code": "blood_sugar", "name": "血糖", "value": "5.2", "unit": "mmol/L" }
+      ],
+      "doctorComment": "血压略高，建议定期监测",
+      "auditComment": "审核通过，结果无异常"
+    },
+    "publishedReport": {
+      "patientName": "回归测试患者D",
+      "patientId": "REG004",
+      "examDate": "2025-01-13",
+      "status": "published",
+      "examItems": [
+        { "code": "blood_pressure", "name": "血压", "value": "115/70", "unit": "mmHg" },
+        { "code": "heart_rate", "name": "心率", "value": "65", "unit": "次/分" },
+        { "code": "blood_sugar", "name": "血糖", "value": "4.5", "unit": "mmol/L" }
+      ],
+      "doctorComment": "各项指标正常",
+      "auditComment": "审核通过"
+    }
+  }
+}

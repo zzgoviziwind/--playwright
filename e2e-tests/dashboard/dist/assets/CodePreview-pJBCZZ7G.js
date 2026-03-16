@@ -1,0 +1,1 @@
+import{d as s,c,f as e,t,o as a,_ as r}from"./index-BjR7_M2q.js";const n={class:"code-preview"},d=s({__name:"CodePreview",props:{code:{}},setup(o){return(_,p)=>(a(),c("div",n,[e("pre",null,[e("code",null,t(o.code),1)])]))}}),l=r(d,[["__scopeId","data-v-23384543"]]);export{l as C};
