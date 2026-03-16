@@ -1,8 +1,19 @@
 <template>
   <div class="ai-generate">
-    <el-row :gutter="20">
+    <!-- Agent 工作流可视化 - 顶部横幅 -->
+    <div v-if="aiStore.isGenerating || aiStore.agentPipeline.agents.some(a => a.status !== 'idle')" class="agent-workflow-section">
+      <AgentWorkflowStatus
+        :agents="aiStore.agentPipeline.agents"
+        :current-agent="aiStore.agentPipeline.currentAgent"
+        :overall-progress="aiStore.agentPipeline.overallProgress"
+        :overall-status="aiStore.agentPipeline.overallStatus"
+        @agent-click="handleAgentClick"
+      />
+    </div>
+
+    <el-row :gutter="20" :class="{ 'with-agent-workflow': aiStore.isGenerating }">
       <!-- 左侧：参数表单 -->
-      <el-col :span="10">
+      <el-col :span="aiStore.isGenerating ? 8 : 10">
         <el-card shadow="never">
           <template #header>
             <span>生成配置</span>
@@ -60,7 +71,7 @@
       </el-col>
 
       <!-- 右侧：进度 + 代码预览 -->
-      <el-col :span="14">
+      <el-col :span="aiStore.isGenerating ? 16 : 14">
         <el-card shadow="never" class="progress-card">
           <template #header>
             <span>{{ form.interactive ? '生成步骤' : '生成进度' }}</span>
@@ -97,6 +108,8 @@ import ProgressLog from '../components/ai/ProgressLog.vue';
 import CodePreview from '../components/ai/CodePreview.vue';
 import StepTimeline from '../components/ai/StepTimeline.vue';
 import InteractiveModals from '../components/ai/InteractiveModals.vue';
+import AgentWorkflowStatus from '../components/ai/AgentWorkflowStatus.vue';
+import type { AgentNode } from '../types/agent.types';
 
 const api = useApi();
 const aiStore = useAiStore();
@@ -110,6 +123,11 @@ onEvent('ai:progress', (data) => {
   }
 });
 
+// LLM 进度事件
+onEvent('ai:llm-progress', (data) => {
+  aiStore.appendLog(`[LLM] ${data.stage} - ${data.progress}%`);
+});
+
 onEvent('ai:complete', (data) => {
   aiStore.setGenerating(false);
   aiStore.setPreviewCode(data.code);
@@ -121,6 +139,32 @@ onEvent('ai:error', (data) => {
   ElMessage.error(`AI 生成失败：${data.error}`);
 });
 
+// Agent 工作流事件
+onEvent('agent:start', (data) => {
+  aiStore.updateAgentStatus(data.agentId, 'running');
+  aiStore.setCurrentAgent(data.agentId);
+});
+
+onEvent('agent:complete', (data) => {
+  aiStore.updateAgentStatus(data.agentId, 'completed', data.result, data.duration);
+  aiStore.setAgentProgress(data.agentId, 100);
+});
+
+onEvent('agent:failed', (data) => {
+  aiStore.updateAgentStatus(data.agentId, 'failed', undefined, undefined, data.error);
+});
+
+onEvent('agent:progress', (data) => {
+  aiStore.setAgentProgress(data.agentId, data.progress);
+});
+
+onEvent('pipeline:complete', (data) => {
+  aiStore.setPipelineOverallStatus('completed');
+  aiStore.setPipelineOverallProgress(100);
+  aiStore.setGenerating(false);
+  ElMessage.success('Agent 流水线执行完成');
+});
+
 const form = reactive({
   feature: '',
   type: 'smoke' as 'smoke' | 'regression',
@@ -129,6 +173,14 @@ const form = reactive({
   temperature: 0.3,
   maxTokens: 8192,
 });
+
+function handleAgentClick(agent: AgentNode) {
+  if (agent.error) {
+    ElMessage.error(`${agent.name} 执行失败：${agent.error}`);
+  } else if (agent.status === 'completed') {
+    ElMessage.success(`${agent.name} 执行成功`);
+  }
+}
 
 async function handlePreview() {
   if (!form.feature) return ElMessage.warning('请输入功能描述');
@@ -153,6 +205,8 @@ async function handleGenerate() {
   if (!form.feature) return ElMessage.warning('请输入功能描述');
   aiStore.setInteractive(form.interactive);
   aiStore.setGenerating(true, 'generate');
+  // 重置 Agent 流水线状态
+  aiStore.resetAgentPipeline();
   try {
     const { data } = await api.post('/ai/generate', {
       feature: form.feature,
@@ -176,5 +230,8 @@ async function handleGenerate() {
 
 <style scoped>
 .ai-generate { height: 100%; }
+.agent-workflow-section {
+  margin-bottom: 20px;
+}
 .progress-card { min-height: 200px; }
 </style>

@@ -356,10 +356,19 @@ export class SteppedPipeline extends EventEmitter {
           this.logger.info('llm-call', '正在调用 LLM...');
 
           const startTime = Date.now();
+
+          // 创建进度回调，发送到 WebSocket
+          const onProgress = (stage: string, progress: number) => {
+            this.logger.info('llm-call', `LLM 进度：${stage} (${progress}%)`);
+            // 通过 logger 事件自动广播到 WebSocket
+            this.emit('llm:progress', { stage, progress, stepId: 'llm-call' });
+          };
+
           const rawResponse = await callLLM(userPrompt, {
             systemPrompt,
             temperature: params.temperature ?? 0.3,
             maxTokens: params.maxTokens ?? 8192,
+            onProgress,
           });
           const duration = Date.now() - startTime;
 

@@ -1,11 +1,11 @@
 <template>
   <el-dialog
-    :model-value="visible"
-    @update:model-value="$emit('update:visible', $event)"
+    v-model="localVisible"
     title="确认文件写入"
     width="80%"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
+    @update:model-value="$emit('update:visible', $event)"
   >
     <div class="write-confirm">
       <el-alert
@@ -53,13 +53,7 @@
     </template>
 
     <!-- 修改路径对话框 -->
-    <el-dialog 
-      :model-value="showPathInput"
-      @update:model-value="showPathInput = $event"
-      title="修改文件路径" 
-      width="50%" 
-      append-to-body
-    >
+    <el-dialog v-model="showPathInput" title="修改文件路径" width="50%" append-to-body>
       <el-form label-width="100px">
         <el-form-item label="文件名">
           <el-input v-model="tempFileName" placeholder="例如：login-ai.spec.ts" />
@@ -74,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { Document } from '@element-plus/icons-vue';
 import { Codemirror } from 'vue-codemirror';
 
@@ -94,6 +88,11 @@ const emit = defineEmits<{
   abort: [];
   'update:visible': [value: boolean];
 }>();
+
+const localVisible = computed({
+  get: () => props.visible,
+  set: (val) => emit('update:visible', val),
+});
 
 const showPathInput = ref(false);
 const tempFileName = ref('');

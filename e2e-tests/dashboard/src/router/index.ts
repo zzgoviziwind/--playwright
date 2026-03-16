@@ -7,6 +7,7 @@ export const router = createRouter({
     { path: '/ai/generate', component: () => import('../views/AiGenerateView.vue') },
     { path: '/ai/modify', component: () => import('../views/AiModifyView.vue') },
     { path: '/ai/url-analyze', component: () => import('../views/UrlAnalyzeView.vue') },
+    { path: '/recorder', component: () => import('../views/TestRecorderView.vue') },
     { path: '/visual/builder', component: () => import('../views/VisualTestBuilderView.vue') },
     { path: '/tests', component: () => import('../views/TestManagerView.vue') },
     { path: '/tests/explorer', component: () => import('../views/TestExplorerView.vue') },

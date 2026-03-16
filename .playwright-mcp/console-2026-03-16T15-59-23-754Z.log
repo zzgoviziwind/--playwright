@@ -1,0 +1,31 @@
+[     343ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3200/favicon.ico:0
+[     354ms] [WARNING] [Vue Router warn]: uncaught error during route navigation: @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:51
+[     354ms] [ERROR] SyntaxError: The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop' @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:2107
+[     354ms] [WARNING] [Vue Router warn]: Unexpected error when starting the router: SyntaxError: The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop' @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:51
+[   72515ms] [WARNING] [Vue Router warn]: uncaught error during route navigation: @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:51
+[   72515ms] [ERROR] SyntaxError: The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop' @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:2107
+[   72517ms] The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop'
+[   73808ms] [WARNING] [Vue Router warn]: uncaught error during route navigation: @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:51
+[   73808ms] [ERROR] SyntaxError: The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop' @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:2107
+[   73809ms] The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop'
+[   79905ms] [WARNING] [Vue Router warn]: uncaught error during route navigation: @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:51
+[   79905ms] [ERROR] SyntaxError: The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop' @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:2107
+[   79906ms] The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop'
+[   86708ms] [WARNING] [Vue Router warn]: uncaught error during route navigation: @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:51
+[   86708ms] [ERROR] SyntaxError: The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop' @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:2107
+[   86710ms] The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop'
+[   87106ms] [WARNING] [Vue Router warn]: uncaught error during route navigation: @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:51
+[   87106ms] [ERROR] SyntaxError: The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop' @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:2107
+[   87107ms] The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop'
+[   87445ms] [WARNING] [Vue Router warn]: uncaught error during route navigation: @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:51
+[   87445ms] [ERROR] SyntaxError: The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop' @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:2107
+[   87447ms] The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop'
+[   87657ms] [WARNING] [Vue Router warn]: uncaught error during route navigation: @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:51
+[   87657ms] [ERROR] SyntaxError: The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop' @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:2107
+[   87658ms] The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop'
+[   87851ms] [WARNING] [Vue Router warn]: uncaught error during route navigation: @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:51
+[   87851ms] [ERROR] SyntaxError: The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop' @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:2107
+[   87852ms] The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop'
+[   88191ms] [WARNING] [Vue Router warn]: uncaught error during route navigation: @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:51
+[   88191ms] [ERROR] SyntaxError: The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop' @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:2107
+[   88192ms] The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop'

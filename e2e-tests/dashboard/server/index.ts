@@ -18,6 +18,7 @@ import { testsRoutes } from './routes/tests.routes';
 import { runnerRoutes } from './routes/runner.routes';
 import { aiRoutes } from './routes/ai.routes';
 import { analyzerRoutes } from './routes/analyzer.routes';
+import { recorderRoutes } from './routes/recorder.routes';
 
 const PORT = parseInt(process.env.DASHBOARD_PORT || '3200', 10);
 const isDev = process.env.NODE_ENV !== 'production';
@@ -34,6 +35,7 @@ async function startServer() {
   app.use('/api/runner', runnerRoutes(PROJECT_ROOT));
   app.use('/api/ai', aiRoutes(PROJECT_ROOT));
   app.use('/api/analyzer', analyzerRoutes(PROJECT_ROOT));
+  app.use('/api/recorder', recorderRoutes());
 
   // 静态代理 playwright-report
   app.use('/report', express.static(path.join(PROJECT_ROOT, 'playwright-report')));

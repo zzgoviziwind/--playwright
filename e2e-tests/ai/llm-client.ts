@@ -1,8 +1,13 @@
 // AI 测试生成系统 - 统一 LLM 客户端
 
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-dotenv.config();
+// 与 server/index.ts 保持一致，从 e2e-tests/.env 加载
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const PROJECT_ROOT = path.resolve(__dirname, '..');
+dotenv.config({ path: path.join(PROJECT_ROOT, '.env') });
 
 const LLM_API_URL = process.env.LLM_API_URL || '';
 const LLM_API_KEY = process.env.LLM_API_KEY || '';
@@ -12,6 +17,7 @@ interface CallLLMOptions {
   systemPrompt?: string;
   temperature?: number;
   maxTokens?: number;
+  onProgress?: (stage: string, progress: number) => void;
 }
 
 /**
@@ -30,7 +36,11 @@ export async function callLLM(
     systemPrompt,
     temperature = 0.3,
     maxTokens = 4096,
+    onProgress,
   } = options;
+
+  // 发送开始进度
+  onProgress?.('开始调用 LLM', 0);
 
   const messages = [
     ...(systemPrompt
@@ -46,11 +56,15 @@ export async function callLLM(
     max_tokens: maxTokens,
   });
 
+  onProgress?.('正在发送请求', 10);
+
   let lastError: Error | null = null;
 
   // 最多重试 1 次（共 2 次调用）
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
+      onProgress?.('等待 AI 响应', 30 + (attempt * 20));
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 180_000);
 
@@ -65,19 +79,26 @@ export async function callLLM(
       });
 
       clearTimeout(timeoutId);
+      onProgress?.('接收 AI 响应', 70);
 
       if (!response.ok) {
         throw new Error(
-          `LLM API 调用失败: ${response.status} ${response.statusText}`
+          `LLM API 调用失败：${response.status} ${response.statusText}`
         );
       }
 
       const data = await response.json();
-      return data.choices[0].message.content;
+      onProgress?.('解析 AI 响应', 85);
+
+      const content = data.choices[0].message.content;
+      onProgress?.('响应接收完成', 100);
+
+      return content;
     } catch (error) {
       lastError = error as Error;
       if (attempt === 0) {
         // 首次失败，等待 3 秒后重试
+        onProgress?.('请求失败，正在重试...', 30);
         await new Promise((resolve) => setTimeout(resolve, 3000));
       }
     }

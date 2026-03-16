@@ -1,0 +1,1 @@
+import{P as f,k as t}from"./index-Dv_7onIe.js";const r=f("tests",()=>{const s=t([]),n=t(null),o=t(""),l=t(!1);function i(e){s.value=e}function c(e){n.value=e}function u(e){o.value=e}return{files:s,selectedFile:n,fileContent:o,loading:l,setFiles:i,selectFile:c,setFileContent:u}});export{r as u};

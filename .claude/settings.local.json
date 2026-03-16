@@ -2,7 +2,29 @@
   "permissions": {
     "allow": [
       "Bash(cd:*)",
-      "Bash(npx playwright:*)"
+      "Bash(npx playwright:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_fill_form",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_run_code",
+      "mcp__playwright__browser_close",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(cd e2e-tests:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsx:*)",
+      "Bash(curl:*)",
+      "Bash(ls:*)",
+      "Bash(cd dashboard:*)",
+      "Bash(netstat:*)",
+      "Bash(taskkill:*)",
+      "Bash(wmic process:*)",
+      "mcp__playwright__browser_console_messages",
+      "mcp__playwright__browser_wait_for",
+      "Bash(dir:*)",
+      "Bash(git add:*)"
     ]
   }
 }

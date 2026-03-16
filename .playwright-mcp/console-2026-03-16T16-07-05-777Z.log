@@ -1,0 +1,42 @@
+[     296ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3200/favicon.ico:0
+[ 1593471ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 1594498ms] [ERROR] WebSocket connection to 'ws://localhost:3200/ws' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3200/src/composables/useWebSocket.ts:14
+[ 1596847ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 1598870ms] [ERROR] WebSocket connection to 'ws://localhost:3200/ws' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3200/src/composables/useWebSocket.ts:14
+[ 1600225ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 1603559ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 1605241ms] [ERROR] WebSocket connection to 'ws://localhost:3200/ws' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3200/src/composables/useWebSocket.ts:14
+[ 1606929ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 1610284ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 1613652ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 1615619ms] [ERROR] WebSocket connection to 'ws://localhost:3200/ws' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3200/src/composables/useWebSocket.ts:14
+[ 1617037ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 1620420ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 1623764ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 1627133ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 1630488ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 1633846ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 1634002ms] [ERROR] WebSocket connection to 'ws://localhost:3200/ws' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3200/src/composables/useWebSocket.ts:14
+[ 1637231ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 1640599ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 1643941ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 1647302ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 1648604ms] [ERROR] Failed to load resource: the server responded with a status of 426 (Upgrade Required) @ http://localhost:24678/:0
+[ 2307323ms] [WARNING] Property "moveDialogVisible" was accessed during render but is not defined on instance. Proxy(Object) at <TestRecorderView>
+at <RouterView>
+at <ElMain>
+at <ElContainer>
+at <ElContainer>
+at <App> [Object, Object, Object, Object, Object, Object] @ http://localhost:3200/node_modules/.vite/deps/element-plus.js?v=b249f6d3:24169
+[ 2711737ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 2712766ms] [ERROR] WebSocket connection to 'ws://localhost:3200/ws' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3200/src/composables/useWebSocket.ts:14
+[ 2715095ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 2717117ms] [ERROR] WebSocket connection to 'ws://localhost:3200/ws' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3200/src/composables/useWebSocket.ts:14
+[ 2718456ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 2721824ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 2723474ms] [ERROR] WebSocket connection to 'ws://localhost:3200/ws' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3200/src/composables/useWebSocket.ts:14
+[ 2725201ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 2728579ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 2731948ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:24678/:0
+[ 2733847ms] [ERROR] WebSocket connection to 'ws://localhost:3200/ws' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3200/src/composables/useWebSocket.ts:14
+[ 2734000ms] [ERROR] Failed to load resource: the server responded with a status of 426 (Upgrade Required) @ http://localhost:24678/:0

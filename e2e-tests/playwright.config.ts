@@ -5,14 +5,14 @@ dotenv.config();
 
 export default defineConfig({
   testDir: './tests',
-  timeout: 60_000, // 增加测试超时时间到 60 秒
+  timeout: 30_000,
   expect: {
-    timeout: 10_000, // 增加期望超时时间到 10 秒
+    timeout: 5_000,
   },
   fullyParallel: false, // 禁用并行执行以避免 fixture 冲突
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: 1, // 强制只使用 1 个 worker
+  workers: process.env.CI ? 4 : 1,
   reporter: process.env.CI
     ? [
         ['html', { open: 'never', outputFolder: 'playwright-report' }],
@@ -35,6 +35,20 @@ export default defineConfig({
     {
       name: 'smoke-chromium',
       testMatch: /smoke\/.*\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+
+    // 录制的测试
+    {
+      name: 'recorded',
+      testMatch: /recorded\/.*\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] },
+    },
+
+    // AI 生成测试示例
+    {
+      name: 'ai-example',
+      testMatch: /ai-example\/.*\.spec\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
 

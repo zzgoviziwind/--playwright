@@ -10,7 +10,15 @@
 - [auth.setup.ts](file://e2e-tests/fixtures/auth.setup.ts)
 - [auth.fixture.ts](file://e2e-tests/fixtures/auth.fixture.ts)
 - [tsconfig.json](file://e2e-tests/tsconfig.json)
+- [junit-report.xml](file://e2e-tests/results/junit-report.xml)
 </cite>
+
+## 更新摘要
+**所做更改**
+- 更新了测试执行效率优化部分，反映更高效的测试执行策略
+- 新增了报告生成优化章节，详细介绍多格式报告生成机制
+- 完善了Allure报告集成和Junit XML报告配置
+- 增强了测试报告归档和通知机制的说明
 
 ## 目录
 1. [简介](#简介)
@@ -28,7 +36,7 @@
 
 本指南提供了针对医院体检报告管理系统端到端测试的GitLab CI配置完整实施指南。该配置基于Playwright框架，实现了从冒烟测试到回归测试的完整测试流水线，支持多浏览器并行执行、测试报告生成和通知集成。
 
-项目采用现代化的测试架构，包含登录态管理、页面对象模式和AI辅助测试功能，通过GitLab CI实现自动化持续集成和部署。
+项目采用现代化的测试架构，包含登录态管理、页面对象模式和AI辅助测试功能，通过GitLab CI实现自动化持续集成和部署。最新的配置优化显著提升了测试执行效率和报告生成能力。
 
 ## 项目结构
 
@@ -94,11 +102,11 @@ Regression --> Workflow
 
 **图表来源**
 - [.gitlab-ci.yml:1-67](file://e2e-tests/.gitlab-ci.yml#L1-L67)
-- [playwright.config.ts:1-68](file://e2e-tests/playwright.config.ts#L1-L68)
+- [playwright.config.ts:1-54](file://e2e-tests/playwright.config.ts#L1-L54)
 
 **章节来源**
 - [.gitlab-ci.yml:1-67](file://e2e-tests/.gitlab-ci.yml#L1-L67)
-- [playwright.config.ts:1-68](file://e2e-tests/playwright.config.ts#L1-L68)
+- [playwright.config.ts:1-54](file://e2e-tests/playwright.config.ts#L1-L54)
 
 ## 核心组件
 
@@ -181,7 +189,7 @@ Allure --> Notification
 
 **图表来源**
 - [.gitlab-ci.yml:1-67](file://e2e-tests/.gitlab-ci.yml#L1-L67)
-- [playwright.config.ts:1-68](file://e2e-tests/playwright.config.ts#L1-L68)
+- [playwright.config.ts:1-54](file://e2e-tests/playwright.config.ts#L1-L54)
 
 ### 测试项目架构
 
@@ -225,16 +233,16 @@ LoginPage --> TestUse : "配置"
 ```
 
 **图表来源**
-- [playwright.config.ts:1-68](file://e2e-tests/playwright.config.ts#L1-L68)
-- [auth.setup.ts:1-28](file://e2e-tests/fixtures/auth.setup.ts#L1-L28)
-- [auth.fixture.ts:1-40](file://e2e-tests/fixtures/auth.fixture.ts#L1-L40)
-- [login.spec.ts:1-25](file://e2e-tests/tests/smoke/login.spec.ts#L1-L25)
+- [playwright.config.ts:1-54](file://e2e-tests/playwright.config.ts#L1-L54)
+- [auth.setup.ts:1-116](file://e2e-tests/fixtures/auth.setup.ts#L1-L116)
+- [auth.fixture.ts:1-52](file://e2e-tests/fixtures/auth.fixture.ts#L1-L52)
+- [login.spec.ts:1-178](file://e2e-tests/tests/smoke/login.spec.ts#L1-L178)
 
 **章节来源**
-- [playwright.config.ts:1-68](file://e2e-tests/playwright.config.ts#L1-L68)
-- [auth.setup.ts:1-28](file://e2e-tests/fixtures/auth.setup.ts#L1-L28)
-- [auth.fixture.ts:1-40](file://e2e-tests/fixtures/auth.fixture.ts#L1-L40)
-- [login.spec.ts:1-25](file://e2e-tests/tests/smoke/login.spec.ts#L1-L25)
+- [playwright.config.ts:1-54](file://e2e-tests/playwright.config.ts#L1-L54)
+- [auth.setup.ts:1-116](file://e2e-tests/fixtures/auth.setup.ts#L1-L116)
+- [auth.fixture.ts:1-52](file://e2e-tests/fixtures/auth.fixture.ts#L1-L52)
+- [login.spec.ts:1-178](file://e2e-tests/tests/smoke/login.spec.ts#L1-L178)
 
 ## 详细组件分析
 
@@ -316,7 +324,7 @@ Setup --> RegFirefox
 ```
 
 **图表来源**
-- [playwright.config.ts:31-66](file://e2e-tests/playwright.config.ts#L31-L66)
+- [playwright.config.ts:33-52](file://e2e-tests/playwright.config.ts#L33-L52)
 
 #### 测试执行策略
 
@@ -337,10 +345,10 @@ Output --> End([测试结束])
 ```
 
 **图表来源**
-- [playwright.config.ts:12-22](file://e2e-tests/playwright.config.ts#L12-L22)
+- [playwright.config.ts:12-16](file://e2e-tests/playwright.config.ts#L12-L16)
 
 **章节来源**
-- [playwright.config.ts:1-68](file://e2e-tests/playwright.config.ts#L1-L68)
+- [playwright.config.ts:1-54](file://e2e-tests/playwright.config.ts#L1-L54)
 
 ### 测试夹具与登录态管理
 
@@ -373,12 +381,12 @@ Fixture->>Fixture : 注入到测试页面
 ```
 
 **图表来源**
-- [auth.setup.ts:17-26](file://e2e-tests/fixtures/auth.setup.ts#L17-L26)
-- [auth.fixture.ts:10-37](file://e2e-tests/fixtures/auth.fixture.ts#L10-L37)
+- [auth.setup.ts:17-116](file://e2e-tests/fixtures/auth.setup.ts#L17-L116)
+- [auth.fixture.ts:10-52](file://e2e-tests/fixtures/auth.fixture.ts#L10-L52)
 
 **章节来源**
-- [auth.setup.ts:1-28](file://e2e-tests/fixtures/auth.setup.ts#L1-L28)
-- [auth.fixture.ts:1-40](file://e2e-tests/fixtures/auth.fixture.ts#L1-L40)
+- [auth.setup.ts:1-116](file://e2e-tests/fixtures/auth.setup.ts#L1-L116)
+- [auth.fixture.ts:1-52](file://e2e-tests/fixtures/auth.fixture.ts#L1-L52)
 
 ### 测试用例设计
 
@@ -399,10 +407,10 @@ ShowErrorMessage --> VerifyErrorVisible[验证错误信息可见]
 ```
 
 **图表来源**
-- [login.spec.ts:4-24](file://e2e-tests/tests/smoke/login.spec.ts#L4-L24)
+- [login.spec.ts:9-178](file://e2e-tests/tests/smoke/login.spec.ts#L9-L178)
 
 **章节来源**
-- [login.spec.ts:1-25](file://e2e-tests/tests/smoke/login.spec.ts#L1-L25)
+- [login.spec.ts:1-178](file://e2e-tests/tests/smoke/login.spec.ts#L1-L178)
 
 ## 依赖关系分析
 
@@ -443,7 +451,7 @@ Fixtures --> AIAssistant
 ```
 
 **图表来源**
-- [package.json:1-27](file://e2e-tests/package.json#L1-L27)
+- [package.json:1-35](file://e2e-tests/package.json#L1-L35)
 
 ### 环境变量管理
 
@@ -456,8 +464,8 @@ Fixtures --> AIAssistant
 | NODE_ENV | development | Node环境 | 可在CI中设置 |
 
 **章节来源**
-- [package.json:1-27](file://e2e-tests/package.json#L1-L27)
-- [playwright.config.ts:24-29](file://e2e-tests/playwright.config.ts#L24-L29)
+- [package.json:1-35](file://e2e-tests/package.json#L1-L35)
+- [playwright.config.ts:24-26](file://e2e-tests/playwright.config.ts#L24-L26)
 
 ## 性能考虑
 
@@ -488,7 +496,7 @@ Video --> Trace
 ```
 
 **图表来源**
-- [playwright.config.ts:12-29](file://e2e-tests/playwright.config.ts#L12-L29)
+- [playwright.config.ts:12-16](file://e2e-tests/playwright.config.ts#L12-L16)
 
 ### 缓存策略
 
@@ -500,8 +508,27 @@ Video --> Trace
 | Playwright浏览器缓存 | ~/.cache/ms-playwright | playwright-${PLAYWRIGHT_VERSION} | 1个月 |
 | 测试报告缓存 | e2e-tests/playwright-report | test-reports-${CI_COMMIT_SHORT_SHA} | 7天 |
 
+### 测试执行效率优化
+
+**更新** 项目实现了多项测试执行效率优化：
+
+#### 多格式报告生成
+- **HTML报告**：实时预览测试结果
+- **JUnit XML报告**：兼容CI系统集成
+- **Allure报告**：丰富的测试分析和可视化
+
+#### 智能重试机制
+- CI环境下自动重试失败的测试用例
+- 支持最多2次重试，提高测试稳定性
+- 避免临时性网络或环境问题影响测试结果
+
+#### 并行执行优化
+- CI环境下启用4个工作进程
+- 禁用完全并行以避免fixture冲突
+- 智能资源分配和任务调度
+
 **章节来源**
-- [playwright.config.ts:12-15](file://e2e-tests/playwright.config.ts#L12-L15)
+- [playwright.config.ts:12-22](file://e2e-tests/playwright.config.ts#L12-L22)
 
 ## 故障排除指南
 
@@ -562,9 +589,6 @@ ExpireTooLate --> DecreaseExpire[减少过期时间]
 | 环境问题 | 重新构建 | 1次 | 30秒 |
 | 资源不足 | 降级执行 | 0次 | 立即失败 |
 
-**章节来源**
-- [playwright.config.ts:14-15](file://e2e-tests/playwright.config.ts#L14-L15)
-
 ### 通知配置
 
 项目集成了企业微信通知机制，支持测试结果的实时通知：
@@ -583,14 +607,45 @@ Team->>Team : 查看测试报告链接
 ```
 
 **图表来源**
-- [.gitlab-ci.yml:53-64](file://e2e-tests/.gitlab-ci.yml#L53-L64)
+- [.gitlab-ci.yml:53-67](file://e2e-tests/.gitlab-ci.yml#L53-L67)
 
 **章节来源**
 - [.gitlab-ci.yml:49-67](file://e2e-tests/.gitlab-ci.yml#L49-L67)
 
+### 报告生成优化
+
+**新增** 项目实现了高效的多格式报告生成机制：
+
+#### HTML报告生成
+- **实时生成**：测试执行过程中实时生成HTML报告
+- **自动打开**：本地开发时自动打开报告，CI环境下保存为制品
+- **详细信息**：包含截图、视频、trace等详细信息
+
+#### JUnit XML报告
+- **标准格式**：生成符合JUnit标准的XML报告
+- **CI集成**：便于与各种CI系统集成
+- **统计信息**：包含测试总数、失败数、跳过数等统计信息
+
+#### Allure报告集成
+- **丰富可视化**：提供详细的测试分析和可视化图表
+- **历史对比**：支持测试结果的历史趋势分析
+- **分类统计**：按测试类别、失败原因等维度进行统计
+
+**章节来源**
+- [playwright.config.ts:16-22](file://e2e-tests/playwright.config.ts#L16-L22)
+- [package.json:11-12](file://e2e-tests/package.json#L11-L12)
+- [junit-report.xml:1-464](file://e2e-tests/results/junit-report.xml#L1-L464)
+
 ## 结论
 
 本GitLab CI配置为医院体检报告管理系统提供了完整的端到端测试解决方案。通过精心设计的流水线阶段、多浏览器测试支持和智能通知机制，确保了测试流程的可靠性、可维护性和可观测性。
+
+**更新亮点** 本次配置优化显著提升了测试执行效率和报告生成能力：
+
+- **多格式报告生成**：同时生成HTML、JUnit XML和Allure三种格式的测试报告
+- **智能重试机制**：在CI环境下自动重试失败的测试用例，提高测试稳定性
+- **并行执行优化**：合理配置工作进程数量，平衡执行效率和资源消耗
+- **高效报告生成**：优化报告生成流程，减少CI执行时间
 
 关键优势包括：
 - **模块化架构**：清晰的阶段划分和作业配置
@@ -628,3 +683,9 @@ Team->>Team : 查看测试报告链接
 - [ ] 实施最小权限原则
 - [ ] 定期轮换访问令牌
 - [ ] 启用审计日志记录
+
+#### 报告优化
+- [ ] 配置多格式报告生成
+- [ ] 优化报告生成性能
+- [ ] 设置报告保留策略
+- [ ] 实现报告质量监控

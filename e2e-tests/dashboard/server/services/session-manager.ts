@@ -225,6 +225,17 @@ class SessionManager {
         log: this.truncateLogData(entry),
       });
     });
+
+    // LLM 进度事件
+    pipeline.on('llm:progress', (data: { stage: string; progress: number; stepId: string }) => {
+      socketManager.broadcast('ai', {
+        type: 'ai:llm-progress',
+        sessionId,
+        stepId: data.stepId,
+        stage: data.stage,
+        progress: data.progress,
+      });
+    });
   }
 
   /** 截断过大的数据，避免 WS 消息过大 */

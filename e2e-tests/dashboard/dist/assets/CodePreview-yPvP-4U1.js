@@ -1,0 +1,1 @@
+import{d as s,o as c,c as t,f as e,t as a,_ as r}from"./index-Dv_7onIe.js";const n={class:"code-preview"},d=s({__name:"CodePreview",props:{code:{}},setup(o){return(_,p)=>(c(),t("div",n,[e("pre",null,[e("code",null,a(o.code),1)])]))}}),l=r(d,[["__scopeId","data-v-23384543"]]);export{l as C};

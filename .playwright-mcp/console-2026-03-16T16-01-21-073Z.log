@@ -1,0 +1,13 @@
+[     263ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3200/favicon.ico:0
+[     274ms] [WARNING] [Vue Router warn]: uncaught error during route navigation: @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:51
+[     274ms] [ERROR] SyntaxError: The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop' @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:2107
+[     275ms] [WARNING] [Vue Router warn]: Unexpected error when starting the router: SyntaxError: The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop' @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:51
+[  252262ms] [WARNING] [Vue Router warn]: uncaught error during route navigation: @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:51
+[  252262ms] [ERROR] SyntaxError: The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop' @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:2107
+[  252262ms] The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop'
+[  252820ms] [WARNING] [Vue Router warn]: uncaught error during route navigation: @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:51
+[  252820ms] [ERROR] SyntaxError: The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop' @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:2107
+[  252820ms] The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop'
+[  252990ms] [WARNING] [Vue Router warn]: uncaught error during route navigation: @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:51
+[  252990ms] [ERROR] SyntaxError: The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop' @ http://localhost:3200/node_modules/.vite/deps/vue-router.js?v=b249f6d3:2107
+[  252990ms] The requested module '/node_modules/.vite/deps/@element-plus_icons-vue.js?v=b249f6d3' does not provide an export named 'Stop'

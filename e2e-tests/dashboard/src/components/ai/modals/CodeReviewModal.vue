@@ -1,11 +1,11 @@
 <template>
   <el-dialog
-    :model-value="visible"
-    @update:model-value="$emit('update:visible', $event)"
+    v-model="localVisible"
     title="代码审查"
     fullscreen
     :close-on-click-modal="false"
     :close-on-press-escape="false"
+    @update:model-value="$emit('update:visible', $event)"
   >
     <div class="code-review">
       <el-row :gutter="16" style="height: 70vh">
@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 
 const props = defineProps<{
@@ -71,6 +71,11 @@ const emit = defineEmits<{
   abort: [];
   'update:visible': [value: boolean];
 }>();
+
+const localVisible = computed({
+  get: () => props.visible,
+  set: (val) => emit('update:visible', val),
+});
 
 const diffTab = ref('processed');
 const editedCode = ref('');

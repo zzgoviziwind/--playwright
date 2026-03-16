@@ -2,6 +2,14 @@
 
 <cite>
 **本文档引用的文件**
+- [e2e-tests/ai/smart-generator.ts](file://e2e-tests/ai/smart-generator.ts)
+- [e2e-tests/ai/prompt-templates.ts](file://e2e-tests/ai/prompt-templates.ts)
+- [e2e-tests/ai/post-processor.ts](file://e2e-tests/ai/post-processor.ts)
+- [e2e-tests/ai/llm-client.ts](file://e2e-tests/ai/llm-client.ts)
+- [e2e-tests/ai/context-collector.ts](file://e2e-tests/ai/context-collector.ts)
+- [e2e-tests/ai/types.ts](file://e2e-tests/ai/types.ts)
+- [e2e-tests/ai/url-prompt-templates.ts](file://e2e-tests/ai/url-prompt-templates.ts)
+- [e2e-tests/ai/page-analyzer.ts](file://e2e-tests/ai/page-analyzer.ts)
 - [e2e-tests/ai/test-generator.ts](file://e2e-tests/ai/test-generator.ts)
 - [e2e-tests/ai/failure-analyzer.ts](file://e2e-tests/ai/failure-analyzer.ts)
 - [e2e-tests/ai/locator-healer.ts](file://e2e-tests/ai/locator-healer.ts)
@@ -12,6 +20,14 @@
 - [e2e-tests/package.json](file://e2e-tests/package.json)
 - [e2e-tests/tsconfig.json](file://e2e-tests/tsconfig.json)
 </cite>
+
+## 更新摘要
+**变更内容**
+- 新增智能生成器模块，提供更复杂的提示模板系统
+- 引入后处理器和代码校验机制，增强生成质量
+- 支持多种测试场景：generate、modify、extend命令
+- 增强URL分析和页面理解能力
+- 重构测试用例生成流程，支持更多样化的测试场景
 
 ## 目录
 1. [简介](#简介)
@@ -26,24 +42,39 @@
 10. [附录](#附录)
 
 ## 简介
-本项目是一个基于大语言模型（LLM）的端到端测试用例生成与自动化测试辅助系统，主要面向“医院体检报告管理系统”。其核心能力包括：
-- 通过LLM生成结构化的测试用例
-- 将测试用例转换为可执行的Playwright测试脚本
-- 对测试失败进行根因分析与定位器自愈
-- 提供API辅助工具以准备测试数据
+本项目是一个基于大语言模型（LLM）的端到端测试用例生成与自动化测试辅助系统，主要面向"医院体检报告管理系统"。经过重构后，系统现已支持更复杂的提示模板和后处理器，显著提升了AI生成测试用例的质量和多样性。
+
+核心能力包括：
+- **智能测试生成**：通过复杂的提示模板系统生成结构化的测试用例
+- **多场景支持**：支持generate、modify、extend三种测试生成场景
+- **代码质量保证**：内置后处理器和代码校验机制
+- **项目上下文感知**：自动收集和分析项目结构、Page Object、Fixture等信息
+- **URL场景分析**：支持任意网站的页面分析和测试生成
+- **统一LLM集成**：通过llm-client模块提供稳定的API调用
 
 系统通过统一的LLM配置（LLM_API_URL、LLM_API_KEY、LLM_MODEL）对接OpenAI兼容的聊天接口，采用严格的JSON格式约束确保输出稳定可靠。
 
 ## 项目结构
-项目采用按功能域划分的目录组织方式，AI相关能力集中在e2e-tests/ai目录中，测试运行配置位于playwright.config.ts，测试数据与工具位于fixtures与utils目录。
+项目采用按功能域划分的目录组织方式，AI相关能力集中在e2e-tests/ai目录中，包含智能生成器、提示模板管理、后处理器、上下文收集器等多个核心模块。
 
 ```mermaid
 graph TB
-subgraph "AI模块"
+subgraph "AI智能生成模块"
+SG["smart-generator.ts<br/>智能生成器"]
+PT["prompt-templates.ts<br/>提示模板管理"]
+PP["post-processor.ts<br/>后处理器"]
+LC["llm-client.ts<br/>LLM客户端"]
+CC["context-collector.ts<br/>上下文收集器"]
+end
+subgraph "URL分析模块"
+PA["page-analyzer.ts<br/>页面分析器"]
+UPT["url-prompt-templates.ts<br/>URL提示模板"]
+end
+subgraph "传统AI模块"
 TG["test-generator.ts<br/>测试用例生成"]
 FA["failure-analyzer.ts<br/>失败分析"]
 LH["locator-healer.ts<br/>定位器自愈"]
-SG["script-generator.ts<br/>脚本生成"]
+SG2["script-generator.ts<br/>脚本生成"]
 end
 subgraph "测试运行"
 PC["playwright.config.ts<br/>测试配置"]
@@ -53,342 +84,334 @@ end
 subgraph "数据与工具"
 AH["api-helper.ts<br/>API辅助"]
 DF["data.fixture.ts<br/>测试夹具"]
+TY["types.ts<br/>类型定义"]
 end
-TG --> PC
-FA --> PC
-LH --> PC
-SG --> PC
+SG --> PT
+SG --> PP
+SG --> LC
+SG --> CC
+PA --> UPT
+TG --> FA
+TG --> LH
+TG --> SG2
 AH --> PC
 DF --> PC
+TY --> SG
+TY --> PA
 PC --> PJ
 PC --> TS
 ```
 
-图表来源
-- [e2e-tests/ai/test-generator.ts:1-107](file://e2e-tests/ai/test-generator.ts#L1-L107)
-- [e2e-tests/ai/failure-analyzer.ts:1-112](file://e2e-tests/ai/failure-analyzer.ts#L1-L112)
-- [e2e-tests/ai/locator-healer.ts:1-131](file://e2e-tests/ai/locator-healer.ts#L1-L131)
-- [e2e-tests/ai/script-generator.ts:1-110](file://e2e-tests/ai/script-generator.ts#L1-L110)
-- [e2e-tests/playwright.config.ts:1-68](file://e2e-tests/playwright.config.ts#L1-L68)
-- [e2e-tests/package.json:1-27](file://e2e-tests/package.json#L1-L27)
-- [e2e-tests/tsconfig.json:1-25](file://e2e-tests/tsconfig.json#L1-L25)
-- [e2e-tests/utils/api-helper.ts:1-172](file://e2e-tests/utils/api-helper.ts#L1-L172)
-- [e2e-tests/fixtures/data.fixture.ts:1-57](file://e2e-tests/fixtures/data.fixture.ts#L1-L57)
+**图表来源**
+- [e2e-tests/ai/smart-generator.ts:1-272](file://e2e-tests/ai/smart-generator.ts#L1-L272)
+- [e2e-tests/ai/prompt-templates.ts:1-192](file://e2e-tests/ai/prompt-templates.ts#L1-L192)
+- [e2e-tests/ai/post-processor.ts:1-232](file://e2e-tests/ai/post-processor.ts#L1-L232)
+- [e2e-tests/ai/llm-client.ts:1-120](file://e2e-tests/ai/llm-client.ts#L1-L120)
+- [e2e-tests/ai/context-collector.ts:1-370](file://e2e-tests/ai/context-collector.ts#L1-L370)
+- [e2e-tests/ai/page-analyzer.ts:1-415](file://e2e-tests/ai/page-analyzer.ts#L1-L415)
+- [e2e-tests/ai/url-prompt-templates.ts:1-291](file://e2e-tests/ai/url-prompt-templates.ts#L1-L291)
 
-章节来源
+**章节来源**
 - [e2e-tests/playwright.config.ts:1-68](file://e2e-tests/playwright.config.ts#L1-L68)
 - [e2e-tests/package.json:1-27](file://e2e-tests/package.json#L1-L27)
 - [e2e-tests/tsconfig.json:1-25](file://e2e-tests/tsconfig.json#L1-L25)
 
 ## 核心组件
-- LLM集成层：统一读取LLM_API_URL、LLM_API_KEY、LLM_MODEL，构造OpenAI兼容的/chat/completions请求，设置Authorization头与temperature参数。
-- 测试用例生成器：接收功能描述与角色信息，生成结构化TestCase数组。
-- 失败分析器：接收测试失败信息与上下文，输出根因分类、描述、修复建议及可选的修复代码。
-- 定位器自愈器：在定位器失效时，基于页面DOM快照生成新的定位器建议。
-- 脚本生成器：将测试用例与Page Object接口结合，生成可直接运行的Playwright .spec.ts脚本。
-- API辅助工具：提供API上下文管理、测试报告创建/删除/状态更新、批量清理等能力。
-- 测试夹具：封装常用前置数据（草稿/待审核/已审核报告），并在用例结束后自动清理。
+- **智能生成器**：统一的测试生成编排引擎，支持三种生成场景
+- **提示模板系统**：复杂的提示模板管理，支持few-shot学习和约束控制
+- **后处理器**：代码清理、校验和格式化，确保生成代码质量
+- **LLM客户端**：统一的LLM API调用接口，支持重试和超时控制
+- **上下文收集器**：自动分析项目结构，收集Page Object、Fixture等信息
+- **URL分析器**：使用Playwright浏览器分析任意网站的页面结构
+- **类型系统**：完整的TypeScript类型定义，确保类型安全
 
-章节来源
-- [e2e-tests/ai/test-generator.ts:1-107](file://e2e-tests/ai/test-generator.ts#L1-L107)
-- [e2e-tests/ai/failure-analyzer.ts:1-112](file://e2e-tests/ai/failure-analyzer.ts#L1-L112)
-- [e2e-tests/ai/locator-healer.ts:1-131](file://e2e-tests/ai/locator-healer.ts#L1-L131)
-- [e2e-tests/ai/script-generator.ts:1-110](file://e2e-tests/ai/script-generator.ts#L1-L110)
-- [e2e-tests/utils/api-helper.ts:1-172](file://e2e-tests/utils/api-helper.ts#L1-L172)
-- [e2e-tests/fixtures/data.fixture.ts:1-57](file://e2e-tests/fixtures/data.fixture.ts#L1-L57)
+**章节来源**
+- [e2e-tests/ai/smart-generator.ts:1-272](file://e2e-tests/ai/smart-generator.ts#L1-L272)
+- [e2e-tests/ai/prompt-templates.ts:1-192](file://e2e-tests/ai/prompt-templates.ts#L1-L192)
+- [e2e-tests/ai/post-processor.ts:1-232](file://e2e-tests/ai/post-processor.ts#L1-L232)
+- [e2e-tests/ai/llm-client.ts:1-120](file://e2e-tests/ai/llm-client.ts#L1-L120)
+- [e2e-tests/ai/context-collector.ts:1-370](file://e2e-tests/ai/context-collector.ts#L1-L370)
+- [e2e-tests/ai/page-analyzer.ts:1-415](file://e2e-tests/ai/page-analyzer.ts#L1-L415)
+- [e2e-tests/ai/types.ts:1-180](file://e2e-tests/ai/types.ts#L1-L180)
 
 ## 架构总览
-系统整体工作流分为三层：
-- 输入层：用户提供的功能描述、测试失败信息、页面DOM片段等。
-- 智能决策层：LLM根据system prompt与user prompt生成结构化输出。
-- 执行层：将LLM输出转换为测试用例、定位器修复建议或可执行脚本，并与Playwright生态集成。
+系统整体工作流分为四个层次：
+- **输入层**：用户提供的功能描述、现有测试代码、URL分析结果等
+- **智能决策层**：复杂的提示模板系统和上下文收集器
+- **执行层**：LLM API调用和后处理器
+- **输出层**：结构化的测试用例、可执行的测试代码和质量保证
 
 ```mermaid
 graph TB
-U["用户输入<br/>功能描述/失败信息/DOM快照"] --> LLM["LLM API<br/>/chat/completions"]
-LLM --> PARSER["解析器<br/>JSON匹配与反序列化"]
-PARSER --> TC["测试用例生成器<br/>TestCase[]"]
-PARSER --> FA["失败分析器<br/>FailureAnalysis"]
-PARSER --> LH["定位器自愈器<br/>HealResult[]"]
-PARSER --> SG["脚本生成器<br/>.spec.ts"]
-TC --> RUN["Playwright运行<br/>fixtures & pages"]
-FA --> RUN
-LH --> RUN
-SG --> RUN
-RUN --> OUT["测试报告/定位器修复建议/脚本产物"]
+U["用户输入<br/>功能描述/现有代码/URL分析"] --> SG["智能生成器<br/>smart-generator.ts"]
+SG --> CC["上下文收集器<br/>collectFullContext()"]
+CC --> PT["提示模板系统<br/>buildGeneratePrompt()"]
+PT --> LLM["LLM API<br/>callLLM()"]
+LLM --> PP["后处理器<br/>processGeneratedCode()"]
+PP --> OUT["结构化输出<br/>测试代码/用例"]
+OUT --> RUN["Playwright运行<br/>fixtures & pages"]
 ```
 
-图表来源
-- [e2e-tests/ai/test-generator.ts:67-106](file://e2e-tests/ai/test-generator.ts#L67-L106)
-- [e2e-tests/ai/failure-analyzer.ts:69-111](file://e2e-tests/ai/failure-analyzer.ts#L69-L111)
-- [e2e-tests/ai/locator-healer.ts:62-103](file://e2e-tests/ai/locator-healer.ts#L62-L103)
-- [e2e-tests/ai/script-generator.ts:63-109](file://e2e-tests/ai/script-generator.ts#L63-L109)
+**图表来源**
+- [e2e-tests/ai/smart-generator.ts:97-164](file://e2e-tests/ai/smart-generator.ts#L97-L164)
+- [e2e-tests/ai/context-collector.ts:360-369](file://e2e-tests/ai/context-collector.ts#L360-L369)
+- [e2e-tests/ai/prompt-templates.ts:102-132](file://e2e-tests/ai/prompt-templates.ts#L102-L132)
+- [e2e-tests/ai/llm-client.ts:21-87](file://e2e-tests/ai/llm-client.ts#L21-L87)
+- [e2e-tests/ai/post-processor.ts:8-45](file://e2e-tests/ai/post-processor.ts#L8-L45)
 
 ## 详细组件分析
 
-### LLM集成配置与调用
-- 环境变量
-  - LLM_API_URL：LLM服务的基础URL（必须）
-  - LLM_API_KEY：访问令牌（必须）
-  - LLM_MODEL：模型名称，默认"gpt-4"
-- 调用方式
-  - 方法：POST /chat/completions
-  - 头部：Content-Type: application/json, Authorization: Bearer {LLM_API_KEY}
-  - Body：model, messages, temperature
-  - 错误处理：当LLM_API_URL或LLM_API_KEY未配置时抛出错误；当HTTP响应非ok时抛出错误
-- 代码示例路径
-  - [LLM调用实现:12-41](file://e2e-tests/ai/test-generator.ts#L12-L41)
-  - [失败分析器中的LLM调用:12-41](file://e2e-tests/ai/failure-analyzer.ts#L12-L41)
-  - [定位器自愈器中的LLM调用:13-45](file://e2e-tests/ai/locator-healer.ts#L13-L45)
-  - [脚本生成器中的LLM调用:13-42](file://e2e-tests/ai/script-generator.ts#L13-L42)
+### 智能生成器与多场景支持
+智能生成器是重构后的核心模块，提供了三种不同的测试生成场景：
 
-章节来源
-- [e2e-tests/ai/test-generator.ts:5-41](file://e2e-tests/ai/test-generator.ts#L5-L41)
-- [e2e-tests/ai/failure-analyzer.ts:5-41](file://e2e-tests/ai/failure-analyzer.ts#L5-L41)
-- [e2e-tests/ai/locator-healer.ts:6-45](file://e2e-tests/ai/locator-healer.ts#L6-L45)
-- [e2e-tests/ai/script-generator.ts:6-42](file://e2e-tests/ai/script-generator.ts#L6-L42)
-
-### 测试用例生成工作流程
-- 输入：功能名称、功能描述、系统角色列表
-- 输出：TestCase数组（包含id、name、precondition、steps、expected、priority、category）
-- 工作流程
-  1) 构造system prompt与user prompt
-  2) 调用LLM API
-  3) 从响应中提取JSON数组并解析为TestCase[]
-  4) 异常处理：若未匹配到JSON数组则抛出错误
-- 代码示例路径
-  - [测试用例生成主函数:67-106](file://e2e-tests/ai/test-generator.ts#L67-L106)
+- **generate场景**：从零开始生成新的测试文件
+- **modify场景**：修改现有的测试文件
+- **extend场景**：在现有测试文件基础上扩展新的测试用例
 
 ```mermaid
 sequenceDiagram
 participant User as "用户"
-participant TG as "测试用例生成器"
+participant SG as "智能生成器"
+participant CC as "上下文收集器"
+participant PT as "提示模板系统"
 participant LLM as "LLM API"
-participant Parser as "JSON解析器"
-User->>TG : "提供功能描述与角色"
-TG->>LLM : "POST /chat/completions"
-LLM-->>TG : "返回包含JSON数组的文本"
-TG->>Parser : "提取并解析JSON数组"
-Parser-->>TG : "TestCase[]"
-TG-->>User : "结构化测试用例"
+participant PP as "后处理器"
+User->>SG : "选择生成场景和参数"
+SG->>CC : "collectFullContext()"
+CC-->>SG : "ProjectContext"
+SG->>PT : "buildGeneratePrompt()/buildModifyPrompt()"
+PT-->>SG : "systemPrompt + userPrompt"
+SG->>LLM : "callLLM()"
+LLM-->>SG : "rawCode"
+SG->>PP : "processGeneratedCode()"
+PP-->>SG : "ProcessResult"
+SG-->>User : "生成的测试代码"
 ```
 
-图表来源
-- [e2e-tests/ai/test-generator.ts:67-106](file://e2e-tests/ai/test-generator.ts#L67-L106)
+**图表来源**
+- [e2e-tests/ai/smart-generator.ts:97-164](file://e2e-tests/ai/smart-generator.ts#L97-L164)
+- [e2e-tests/ai/context-collector.ts:360-369](file://e2e-tests/ai/context-collector.ts#L360-L369)
+- [e2e-tests/ai/prompt-templates.ts:102-191](file://e2e-tests/ai/prompt-templates.ts#L102-L191)
+- [e2e-tests/ai/post-processor.ts:8-45](file://e2e-tests/ai/post-processor.ts#L8-L45)
 
-章节来源
-- [e2e-tests/ai/test-generator.ts:67-106](file://e2e-tests/ai/test-generator.ts#L67-L106)
+**章节来源**
+- [e2e-tests/ai/smart-generator.ts:97-272](file://e2e-tests/ai/smart-generator.ts#L97-L272)
 
-### JSON格式规范与数据模型
-- TestCase接口
-  - 字段：id、name、precondition、steps（字符串数组）、expected、priority（'P0'|'P1'|'P2'）、category（'正向'|'逆向'|'边界'|'权限'）
-  - 用途：承载结构化测试用例
-- FailureAnalysis接口
-  - 字段：category（'locator'|'logic'|'env'|'data'）、description、suggestion、fixCode（可选）
-  - 用途：承载失败根因分析结果
-- HealResult接口
-  - 字段：originalLocator、newLocator、confidence、strategy
-  - 用途：承载定位器修复建议
-- GenerateTestCasesInput接口
-  - 字段：featureName、description、roles
-  - 用途：测试用例生成输入
-- AnalyzeFailureInput接口
-  - 字段：testName、errorMessage、screenshot（可选）、recentChanges（可选）
-  - 用途：失败分析输入
-- GenerateScriptInput接口
-  - 字段：testCase（TestCase）、pageObjects（POInterface[]）、fixtures（字符串数组）
-  - 用途：脚本生成输入
-- POInterface接口
-  - 字段：className、methods（字符串数组）
-  - 用途：Page Object接口描述
+### 复杂提示模板系统
+提示模板系统是重构的关键创新，提供了以下功能：
 
-章节来源
-- [e2e-tests/ai/test-generator.ts:45-59](file://e2e-tests/ai/test-generator.ts#L45-L59)
-- [e2e-tests/ai/failure-analyzer.ts:45-61](file://e2e-tests/ai/failure-analyzer.ts#L45-L61)
-- [e2e-tests/ai/locator-healer.ts:49-54](file://e2e-tests/ai/locator-healer.ts#L49-L54)
-- [e2e-tests/ai/script-generator.ts:46-55](file://e2e-tests/ai/script-generator.ts#L46-L55)
-
-### 失败分析与定位器自愈
-- 失败分析
-  - 输入：测试名称、错误信息、截图（可选）、最近变更（可选）
-  - 输出：FailureAnalysis对象
-  - 实现要点：通过JSON模式约束确保输出结构稳定
-- 定位器自愈
-  - 输入：Page实例、失效定位器、元素描述
-  - 输出：HealResult对象（包含新定位器、置信度、修复策略）
-  - 实现要点：截取页面DOM片段作为上下文，优先使用data-testid，其次role+name，最后文本/CSS选择器
+- **few-shot学习**：基于现有测试文件的示例学习
+- **硬约束控制**：严格的代码风格和项目规范约束
+- **场景特定模板**：针对不同测试场景的专门提示
+- **项目上下文整合**：动态整合项目结构信息
 
 ```mermaid
 flowchart TD
-Start(["开始"]) --> BuildPrompt["构建分析Prompt"]
+Start(["开始"]) --> CollectContext["收集项目上下文"]
+CollectContext --> SelectTemplate["选择提示模板"]
+SelectTemplate --> BuildFewShot["构建few-shot示例"]
+BuildFewShot --> ApplyConstraints["应用硬约束"]
+ApplyConstraints --> BuildPrompt["构建最终提示"]
 BuildPrompt --> CallLLM["调用LLM API"]
-CallLLM --> ParseJSON{"解析JSON成功？"}
-ParseJSON --> |是| ReturnResult["返回分析结果"]
-ParseJSON --> |否| ThrowErr["抛出格式异常错误"]
-ThrowErr --> End(["结束"])
-ReturnResult --> End
+CallLLM --> ExtractCode["提取代码块"]
+ExtractCode --> End(["结束"])
 ```
 
-图表来源
-- [e2e-tests/ai/failure-analyzer.ts:69-111](file://e2e-tests/ai/failure-analyzer.ts#L69-L111)
-- [e2e-tests/ai/locator-healer.ts:62-103](file://e2e-tests/ai/locator-healer.ts#L62-L103)
+**图表来源**
+- [e2e-tests/ai/prompt-templates.ts:102-132](file://e2e-tests/ai/prompt-templates.ts#L102-L132)
+- [e2e-tests/ai/context-collector.ts:360-369](file://e2e-tests/ai/context-collector.ts#L360-L369)
 
-章节来源
-- [e2e-tests/ai/failure-analyzer.ts:69-111](file://e2e-tests/ai/failure-analyzer.ts#L69-L111)
-- [e2e-tests/ai/locator-healer.ts:62-103](file://e2e-tests/ai/locator-healer.ts#L62-L103)
+**章节来源**
+- [e2e-tests/ai/prompt-templates.ts:1-192](file://e2e-tests/ai/prompt-templates.ts#L1-L192)
 
-### 脚本生成器与Playwright集成
-- 输入：TestCase、Page Object接口描述、可用Fixture列表
-- 输出：完整的Playwright .spec.ts脚本内容
-- 实现要点：严格遵循Playwright组织方式（test.describe、fixture、beforeEach、expect断言），并提供API工具函数说明
+### 后处理器与代码质量保证
+后处理器是重构的重要组成部分，提供了七层质量保证：
 
-```mermaid
-sequenceDiagram
-participant TG as "测试用例生成器"
-participant SG as "脚本生成器"
-participant LLM as "LLM API"
-participant FS as "文件系统"
-TG-->>SG : "TestCase + PO接口 + Fixtures"
-SG->>LLM : "生成.spec.ts脚本请求"
-LLM-->>SG : "返回脚本文本"
-SG-->>FS : "写入 .spec.ts 文件"
-FS-->>SG : "完成"
-```
+1. **Markdown标记清理**：移除代码围栏和说明文字
+2. **导入路径修正**：自动修正相对路径和别名
+3. **Fixture导入修复**：根据使用情况修正导入源
+4. **Page Object引用校验**：验证PO类的有效性
+5. **方法调用校验**：检查PO方法的正确性
+6. **格式标准化**：添加AI生成标记和统一格式
+7. **括号匹配检查**：确保代码结构完整性
 
-图表来源
-- [e2e-tests/ai/script-generator.ts:63-109](file://e2e-tests/ai/script-generator.ts#L63-L109)
+**章节来源**
+- [e2e-tests/ai/post-processor.ts:1-232](file://e2e-tests/ai/post-processor.ts#L1-L232)
 
-章节来源
-- [e2e-tests/ai/script-generator.ts:63-109](file://e2e-tests/ai/script-generator.ts#L63-L109)
+### LLM客户端与统一API
+LLM客户端提供了稳定的API调用接口，包含以下特性：
 
-### API辅助工具与测试夹具
-- API辅助工具
-  - 单例API上下文管理（自动登录并注入Authorization头）
-  - 提供创建/删除/状态更新/查询报告等方法
-  - 支持批量清理测试数据
-- 测试夹具
-  - 自动创建草稿/待审核/已审核报告
-  - 在用例结束后自动清理，避免脏数据
+- **环境变量配置**：LLM_API_URL、LLM_API_KEY、LLM_MODEL
+- **重试机制**：最多重试1次，首次失败后3秒延迟
+- **超时控制**：180秒超时，防止长时间阻塞
+- **JSON提取工具**：支持JSON对象和数组提取
+- **代码块提取**：自动清理Markdown标记
 
-```mermaid
-classDiagram
-class ApiHelper {
-+getApiContext() APIRequestContext
-+createTestReport(options) Promise~string~
-+deleteTestReport(id) Promise~void~
-+updateReportStatus(id,status) Promise~void~
-+getReport(id) Promise~ReportData~
-+cleanupTestReports(prefix) Promise~void~
-+disposeApiContext() Promise~void~
-}
-class DataFixture {
-+draftReport string
-+pendingAuditReport string
-+auditedReport string
-}
-ApiHelper <.. DataFixture : "被使用"
-```
+**章节来源**
+- [e2e-tests/ai/llm-client.ts:1-120](file://e2e-tests/ai/llm-client.ts#L1-L120)
 
-图表来源
-- [e2e-tests/utils/api-helper.ts:45-171](file://e2e-tests/utils/api-helper.ts#L45-L171)
-- [e2e-tests/fixtures/data.fixture.ts:13-54](file://e2e-tests/fixtures/data.fixture.ts#L13-L54)
+### 上下文收集器与项目理解
+上下文收集器能够自动分析项目结构，提供完整的项目上下文：
 
-章节来源
-- [e2e-tests/utils/api-helper.ts:45-171](file://e2e-tests/utils/api-helper.ts#L45-L171)
-- [e2e-tests/fixtures/data.fixture.ts:13-54](file://e2e-tests/fixtures/data.fixture.ts#L13-L54)
+- **Page Object分析**：提取类名、定位器、方法签名和JSDoc
+- **Fixture收集**：识别角色Fixture和数据Fixture
+- **测试模式学习**：分析现有测试文件的模式和风格
+- **数据Schema收集**：提取测试数据结构和示例
+- **工具函数识别**：发现项目中的工具函数
+
+**章节来源**
+- [e2e-tests/ai/context-collector.ts:1-370](file://e2e-tests/ai/context-collector.ts#L1-L370)
+
+### URL分析器与页面理解
+URL分析器使用Playwright浏览器实际访问目标URL，提供精确的页面结构分析：
+
+- **真实浏览器渲染**：支持SPA应用的完整渲染
+- **元素提取**：自动识别表单、按钮、导航、表格等元素
+- **选择器生成**：为每个元素生成Playwright友好的选择器
+- **认证支持**：支持Cookie和localStorage注入
+- **视频录制**：可选的页面录制功能
+
+**章节来源**
+- [e2e-tests/ai/page-analyzer.ts:1-415](file://e2e-tests/ai/page-analyzer.ts#L1-L415)
+
+### 传统AI模块的演进
+原有的AI模块经过重构，现在作为智能生成系统的补充：
+
+- **测试用例生成器**：简化为基本的JSON数组提取
+- **失败分析器**：支持更复杂的分析场景
+- **定位器自愈器**：增强的DOM快照分析
+- **脚本生成器**：与智能生成器协同工作
+
+**章节来源**
+- [e2e-tests/ai/test-generator.ts:1-61](file://e2e-tests/ai/test-generator.ts#L1-L61)
+- [e2e-tests/ai/failure-analyzer.ts:1-112](file://e2e-tests/ai/failure-analyzer.ts#L1-L112)
+- [e2e-tests/ai/locator-healer.ts:1-131](file://e2e-tests/ai/locator-healer.ts#L1-L131)
+- [e2e-tests/ai/script-generator.ts:1-110](file://e2e-tests/ai/script-generator.ts#L1-L110)
+
+### 类型系统与类型安全
+完整的TypeScript类型系统确保了代码的类型安全：
+
+- **Page Object类型**：结构化描述PO类的信息
+- **Fixture类型**：角色Fixture和数据Fixture的详细信息
+- **测试模式类型**：现有测试文件的模式信息
+- **项目上下文类型**：聚合的项目信息
+- **URL分析类型**：页面分析结果的结构化表示
+
+**章节来源**
+- [e2e-tests/ai/types.ts:1-180](file://e2e-tests/ai/types.ts#L1-L180)
 
 ## 依赖关系分析
-- 运行时依赖
+重构后的系统具有更复杂的依赖关系：
+
+- **运行时依赖**
   - Playwright测试框架与类型
   - dotenv用于加载环境变量
   - MySQL驱动（用于数据库相关场景）
-- 脚本与引擎
-  - Node >= 18
-  - TypeScript编译与路径别名配置
-- 项目内依赖
-  - AI模块之间相互独立，均依赖dotenv加载LLM配置
-  - 测试运行依赖playwright.config.ts中的项目配置与环境变量
+  - TypeScript编译器和类型定义
+- **智能生成器依赖**
+  - 上下文收集器依赖整个项目结构
+  - 提示模板系统依赖类型定义
+  - 后处理器依赖上下文信息
+- **URL分析依赖**
+  - Playwright浏览器引擎
+  - 项目中的utils和fixtures模块
 
 ```mermaid
 graph LR
-DOTENV["dotenv"] --> TG["test-generator.ts"]
-DOTENV --> FA["failure-analyzer.ts"]
-DOTENV --> LH["locator-healer.ts"]
-DOTENV --> SG["script-generator.ts"]
-PW["@playwright/test"] --> PC["playwright.config.ts"]
-TS["TypeScript"] --> PC
-TS --> PJ["package.json"]
+DOTENV["dotenv"] --> LLM["llm-client.ts"]
+PLAYWRIGHT["@playwright/test"] --> PA["page-analyzer.ts"]
+TYPESCRIPT["TypeScript"] --> SG["smart-generator.ts"]
+TYPESCRIPT --> PT["prompt-templates.ts"]
+TYPESCRIPT --> PP["post-processor.ts"]
+TYPESCRIPT --> CC["context-collector.ts"]
+TYPESCRIPT --> TY["types.ts"]
+SG --> CC
+SG --> PT
+SG --> PP
+SG --> LLM
+PA --> TY
+CC --> TY
+PT --> TY
+PP --> TY
 ```
 
-图表来源
+**图表来源**
 - [e2e-tests/package.json:17-25](file://e2e-tests/package.json#L17-L25)
 - [e2e-tests/playwright.config.ts:1-68](file://e2e-tests/playwright.config.ts#L1-L68)
 - [e2e-tests/tsconfig.json:1-25](file://e2e-tests/tsconfig.json#L1-L25)
 
-章节来源
+**章节来源**
 - [e2e-tests/package.json:17-25](file://e2e-tests/package.json#L17-L25)
 - [e2e-tests/tsconfig.json:1-25](file://e2e-tests/tsconfig.json#L1-L25)
 
 ## 性能考虑
-- 温度系数调优
-  - 测试用例生成：temperature=0.3，提升确定性
-  - 失败分析：temperature=0.3，保持稳定输出
-  - 定位器自愈：temperature=0.1，最大化准确性
-  - 脚本生成：temperature=0.2，平衡创造性与稳定性
-- 网络与并发
-  - LLM调用为同步阻塞操作，建议在CI中合理配置workers与retries
-  - API上下文复用（单例）减少重复登录开销
-- 输出解析
-  - 使用正则匹配JSON片段，避免全量解析带来的不确定性
-- 缓存与重试
-  - 可在上层增加LLM调用缓存与指数退避重试策略（建议）
+重构后的系统在性能方面有以下优化：
+
+- **温度系数调优**
+  - generate场景：temperature=0.3，平衡创造性和稳定性
+  - modify/extend场景：temperature=0.3，保持一致性
+  - URL分析：temperature=0，最大化准确性
+- **上下文缓存**
+  - 上下文收集结果可缓存，避免重复分析
+  - 提示模板可预编译，减少运行时开销
+- **并发优化**
+  - LLM调用支持并发，但需注意API限制
+  - 后处理器可并行处理多个文件
+- **内存管理**
+  - 大文件分析时注意内存使用
+  - 及时释放Playwright浏览器资源
 
 ## 故障排除指南
-- LLM配置缺失
-  - 现象：抛出“LLM_API_URL 和 LLM_API_KEY 未配置”错误
-  - 处理：检查.env文件或CI环境变量是否正确设置
-  - 参考路径：[LLM配置检查:13-15](file://e2e-tests/ai/test-generator.ts#L13-L15)
-- LLM调用失败
-  - 现象：HTTP非ok响应，抛出包含状态码与状态文本的错误
-  - 处理：检查服务可用性、网络连通性、API密钥有效性
-  - 参考路径：[HTTP错误处理:35-37](file://e2e-tests/ai/test-generator.ts#L35-L37)
-- 输出格式异常
-  - 现象：无法匹配到JSON片段，抛出“AI返回格式异常，无法解析...”错误
-  - 处理：调整prompt约束、提高temperature、确认模型支持JSON输出
-  - 参考路径：[JSON解析与异常:100-103](file://e2e-tests/ai/test-generator.ts#L100-L103)
-- 定位器修复失败
-  - 现象：healLocator返回strategy包含“修复失败: ...”
-  - 处理：检查DOM快照长度、元素描述清晰度、定位器复杂度
-  - 参考路径：[批量修复失败处理:119-126](file://e2e-tests/ai/locator-healer.ts#L119-L126)
-- API上下文问题
-  - 现象：鉴权失败或请求超时
-  - 处理：确认API_BASE_URL、管理员凭据、网络可达性
-  - 参考路径：[API上下文与登录:45-77](file://e2e-tests/utils/api-helper.ts#L45-L77)
+重构后的系统提供了更完善的错误处理：
 
-章节来源
-- [e2e-tests/ai/test-generator.ts:13-15](file://e2e-tests/ai/test-generator.ts#L13-L15)
-- [e2e-tests/ai/test-generator.ts:35-37](file://e2e-tests/ai/test-generator.ts#L35-L37)
-- [e2e-tests/ai/test-generator.ts:100-103](file://e2e-tests/ai/test-generator.ts#L100-L103)
-- [e2e-tests/ai/locator-healer.ts:119-126](file://e2e-tests/ai/locator-healer.ts#L119-L126)
-- [e2e-tests/utils/api-helper.ts:45-77](file://e2e-tests/utils/api-helper.ts#L45-L77)
+- **智能生成器错误**
+  - 现象：generate/modify/extend命令失败
+  - 处理：检查项目结构、LLM配置、文件路径
+  - 参考路径：[命令执行错误处理:97-164](file://e2e-tests/ai/smart-generator.ts#L97-L164)
+- **提示模板错误**
+  - 现象：提示构建失败或约束不满足
+  - 处理：检查上下文收集、模板配置
+  - 参考路径：[提示模板构建:102-132](file://e2e-tests/ai/prompt-templates.ts#L102-L132)
+- **后处理器错误**
+  - 现象：代码校验失败或格式化错误
+  - 处理：查看警告信息、检查生成代码
+  - 参考路径：[后处理校验:8-45](file://e2e-tests/ai/post-processor.ts#L8-L45)
+- **LLM调用错误**
+  - 现象：API调用失败或超时
+  - 处理：检查网络连接、API密钥、重试机制
+  - 参考路径：[LLM调用重试:52-86](file://e2e-tests/ai/llm-client.ts#L52-L86)
+- **URL分析错误**
+  - 现象：页面分析失败或元素识别错误
+  - 处理：检查浏览器配置、等待时间、认证信息
+  - 参考路径：[URL分析配置:20-41](file://e2e-tests/ai/page-analyzer.ts#L20-L41)
+
+**章节来源**
+- [e2e-tests/ai/smart-generator.ts:97-272](file://e2e-tests/ai/smart-generator.ts#L97-L272)
+- [e2e-tests/ai/prompt-templates.ts:102-191](file://e2e-tests/ai/prompt-templates.ts#L102-L191)
+- [e2e-tests/ai/post-processor.ts:8-45](file://e2e-tests/ai/post-processor.ts#L8-L45)
+- [e2e-tests/ai/llm-client.ts:52-86](file://e2e-tests/ai/llm-client.ts#L52-L86)
+- [e2e-tests/ai/page-analyzer.ts:20-41](file://e2e-tests/ai/page-analyzer.ts#L20-L41)
 
 ## 结论
-本项目通过标准化的LLM集成与严格的JSON输出约束，实现了从功能描述到可执行测试脚本的自动化闭环。AI模块具备良好的扩展性，可进一步引入缓存、重试与监控机制以提升稳定性与可观测性。配合Playwright生态与API辅助工具，能够高效支撑端到端测试的生成与维护。
+经过重构的AI测试用例生成器通过引入智能生成器、复杂提示模板系统和后处理器，显著提升了测试用例生成的质量和多样性。新系统不仅保持了原有功能的稳定性，还增加了对多种测试场景的支持，提供了更好的代码质量保证和用户体验。配合Playwright生态和API辅助工具，能够高效支撑端到端测试的生成与维护。
 
 ## 附录
-- 配置参数说明
+- **配置参数说明**
   - LLM_API_URL：LLM服务基础URL（必须）
   - LLM_API_KEY：访问令牌（必须）
   - LLM_MODEL：模型名称（默认"gpt-4"）
   - API_BASE_URL：API服务基础URL（默认"http://localhost:8080/api"）
   - BASE_URL：前端应用基础URL（默认"http://localhost:8080"）
-- 常用命令
+- **常用命令**
+  - 生成新测试：npx playwright test --grep "generate"
+  - 修改现有测试：npx playwright test --grep "modify"
+  - 扩展现有测试：npx playwright test --grep "extend"
   - 冒烟测试：npm run test:smoke
   - 回归测试：npm run test:regression
   - 全量测试：npm run test:all
   - 生成HTML报告：npm run report:html
   - 生成Allure报告：npm run report:allure
 
-章节来源
+**章节来源**
 - [e2e-tests/playwright.config.ts:24-29](file://e2e-tests/playwright.config.ts#L24-L29)
 - [e2e-tests/package.json:6-12](file://e2e-tests/package.json#L6-L12)

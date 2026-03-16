@@ -1,11 +1,11 @@
 <template>
   <el-dialog
-    :model-value="visible"
-    @update:model-value="$emit('update:visible', $event)"
+    v-model="localVisible"
     :title="`步骤失败：${data?.stepName || '未知步骤'}`"
     width="60%"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
+    @update:model-value="$emit('update:visible', $event)"
   >
     <div class="step-error">
       <el-alert
@@ -45,9 +45,10 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { CircleClose } from '@element-plus/icons-vue';
 
-defineProps<{
+const props = defineProps<{
   visible: boolean;
   data: {
     stepName: string;
@@ -57,12 +58,17 @@ defineProps<{
   };
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   retry: [];
   skip: [];
   abort: [];
   'update:visible': [value: boolean];
 }>();
+
+const localVisible = computed({
+  get: () => props.visible,
+  set: (val) => emit('update:visible', val),
+});
 </script>
 
 <style scoped>

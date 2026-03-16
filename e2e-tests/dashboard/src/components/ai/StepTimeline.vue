@@ -26,6 +26,15 @@
           <span>处理中...</span>
         </div>
 
+        <!-- LLM 进度条 -->
+        <div v-if="step.id === 'llm-call' && step.status === 'running' && llmProgress > 0" class="llm-progress">
+          <el-progress :percentage="llmProgress" :stroke-width="8" :show-text="true" :text-inside="true">
+            <template #default="{ percentage }">
+              <span class="llm-progress-text">{{ llmProgressStage }} - {{ percentage }}%</span>
+            </template>
+          </el-progress>
+        </div>
+
         <!-- 等待确认指示 -->
         <div v-if="step.status === 'wait-confirm'" class="step-waiting">
           <el-icon class="waiting-pulse"><Bell /></el-icon>
@@ -65,18 +74,35 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { Loading, Bell, ArrowUp, ArrowDown } from '@element-plus/icons-vue';
 import type { PipelineStep, StepStatus, DebugLogEntry } from '../../types/interactive.types';
+import { useWebSocket } from '../../composables/useWebSocket';
 
 const props = defineProps<{
   steps: PipelineStep[];
   debugLogs: DebugLogEntry[];
 }>();
 
+const { onEvent } = useWebSocket();
+
 const expandedSteps = ref(new Set<string>());
 const logDataVisible = ref(false);
 const logDataContent = ref('');
+
+// LLM 进度状态
+const llmProgress = ref(0);
+const llmProgressStage = ref('');
+
+// 监听 LLM 进度事件
+onMounted(() => {
+  onEvent('ai:llm-progress', (data) => {
+    llmProgress.value = data.progress;
+    llmProgressStage.value = data.stage;
+  });
+});
+
+// 组件卸载时清理（由 useWebSocket 自动处理）
 
 function toggleExpand(stepId: string) {
   if (expandedSteps.value.has(stepId)) {
@@ -182,6 +208,13 @@ function showLogData(log: DebugLogEntry) {
   color: #409EFF;
   font-size: 13px;
   margin-top: 4px;
+}
+.llm-progress {
+  margin-top: 8px;
+}
+.llm-progress-text {
+  font-size: 12px;
+  font-weight: 500;
 }
 .step-waiting {
   display: flex;

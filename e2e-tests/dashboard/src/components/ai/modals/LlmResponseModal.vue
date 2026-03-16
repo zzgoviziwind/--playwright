@@ -1,11 +1,11 @@
 <template>
   <el-dialog
-    :model-value="visible"
-    @update:model-value="$emit('update:visible', $event)"
+    v-model="localVisible"
     title="LLM 响应"
     width="80%"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
+    @update:model-value="$emit('update:visible', $event)"
   >
     <div class="llm-response">
       <div class="response-info">
@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 
 const props = defineProps<{
@@ -54,6 +54,11 @@ const emit = defineEmits<{
   abort: [];
   'update:visible': [value: boolean];
 }>();
+
+const localVisible = computed({
+  get: () => props.visible,
+  set: (val) => emit('update:visible', val),
+});
 
 const rawResponse = ref('');
 const cmOptions = {
