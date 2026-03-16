@@ -1,194 +1,185 @@
-// AI 生成 - 2026-03-15
+// AI 生成 - 2026-03-16
+// 测试流程：登录 - 总检 - 主检评估 - 开始主检 - 总检
 
 import { test, expect } from '../../fixtures/data.fixture';
-import { ReportListPage } from '../../pages/report-list.page';
-import { ReportDetailPage } from '../../pages/report-detail.page';
-import { ReportEditPage } from '../../pages/report-edit.page';
-import { createTestReport, deleteTestReport } from '../../utils/api-helper';
 
-test.describe('管理员报告管理测试 (Admin Report Management)', () => {
-  test('验证管理员可访问报告列表页面', async ({ adminPage }) => {
-    const listPage = new ReportListPage(adminPage);
-    await listPage.goto();
-    // 不要求必须找到特定元素，只要页面加载即可
-    await expect(adminPage).toBeTruthy();
+test.describe('登录 - 总检 - 主检评估流程测试', () => {
+  test('验证管理员可成功登录系统', async ({ adminPage }) => {
+    // 登录成功后验证 URL 包含预约页面
+    await expect(adminPage).toHaveURL(/.*reservation.*/);
+    await expect(adminPage.locator('text=武汉光谷医院')).toBeVisible();
   });
 
-  test('验证管理员可通过姓名搜索报告', async ({ adminPage }) => {
-    const listPage = new ReportListPage(adminPage);
-    await listPage.goto();
-    
-    try {
-      // 尝试搜索，不依赖 fixture 数据
-      await listPage.searchByName('Test');
-      await expect(listPage.searchInput).toHaveValue('Test');
-    } catch (e: any) {
-      // 如果搜索功能不可用，跳过此步骤
-      console.log('Search functionality not available:', e.message);
-    }
+  test('验证管理员可访问主检评估页面', async ({ adminPage }) => {
+    // 直接导航到主检评估页面
+    await adminPage.goto('#/inspectionmanage/general-list');
+    await adminPage.waitForLoadState('networkidle');
+    await adminPage.waitForTimeout(1000);
+
+    // 验证 URL 包含主检评估路径
+    await expect(adminPage).toHaveURL(/.*general-list.*/);
+
+    // 验证页面加载成功，包含搜索框（使用 placeholder 定位）
+    await expect(adminPage.locator('input[placeholder*="姓名"], input[placeholder*="卡号"], input[placeholder*="单位名"]').first()).toBeVisible();
   });
 
-  test('验证管理员可通过状态筛选报告', async ({ adminPage }) => {
-    const listPage = new ReportListPage(adminPage);
-    await listPage.goto();
-    try {
-      await listPage.filterByStatus('draft');
-      await expect(listPage.statusFilter).toHaveValue('draft');
-    } catch (e: any) {
-      // 如果筛选功能不可用，跳过此步骤
-      console.log('Filter functionality not available:', e.message);
-    }
+  test('验证管理员可查询待评估列表', async ({ adminPage }) => {
+    // 导航到主检评估页面
+    await adminPage.goto('#/inspectionmanage/general-list');
+    await adminPage.waitForLoadState('networkidle');
+    await adminPage.waitForTimeout(500);
+
+    // 点击查询按钮
+    await adminPage.getByRole('button', { name: '查询' }).click();
+    await adminPage.waitForLoadState('networkidle');
+
+    // 验证列表加载成功（表格应该有数据）
+    const table = adminPage.locator('table').nth(1);
+    await expect(table).toBeVisible();
   });
 
-  test('验证管理员可打开报告详情页', async ({ adminPage }) => {
-    const listPage = new ReportListPage(adminPage);
-    await listPage.goto();
-    
-    try {
-      // 先检查表格是否有数据
-      const rowCount = await listPage.getRowCount();
-      console.log('Report table row count:', rowCount);
-      
-      if (rowCount > 0) {
-        await listPage.openReport(0);
-        const detailPage = new ReportDetailPage(adminPage);
-        await expect(detailPage.patientName).toBeVisible();
-      } else {
-        console.log('No reports available in the table');
-      }
-    } catch (e: any) {
-      // 如果打不开详情页，跳过此步骤
-      console.log('Cannot open report detail:', e.message);
-    }
+  test('验证管理员可开始主检', async ({ adminPage }) => {
+    // 导航到主检评估页面
+    await adminPage.goto('#/inspectionmanage/general-list');
+    await adminPage.waitForLoadState('networkidle');
+    await adminPage.waitForTimeout(500);
+
+    // 点击查询按钮加载数据
+    await adminPage.getByRole('button', { name: '查询' }).click();
+    await adminPage.waitForLoadState('networkidle');
+
+    // 点击第一个"开始主检"按钮
+    const startBtn = adminPage.getByRole('button', { name: '开始主检' }).first();
+    await expect(startBtn).toBeVisible();
+    await startBtn.click();
+
+    // 等待页面跳转到主检详情页
+    await adminPage.waitForLoadState('networkidle');
+    await adminPage.waitForTimeout(1000);
+
+    // 验证 URL 包含主检详情路径
+    await expect(adminPage).toHaveURL(/.*inspectionmanage\/general.*/);
+
+    // 验证页面加载成功，包含患者信息
+    await expect(adminPage.locator('text=客户资料')).toBeVisible();
   });
 
-  // 跳过依赖 API 创建数据的测试
-  test.skip('验证管理员可查看体检数据详情', async ({ adminPage, draftReport }) => {
-    if (!draftReport) {
-      console.log('跳过测试：没有可用的报告 ID');
-      test.skip();
-      return;
-    }
-    
-    const detailPage = new ReportDetailPage(adminPage);
-    try {
-      await detailPage.goto(draftReport);
-      const data = await detailPage.getExamData();
-      expect(data.bloodPressure).toBeDefined();
-      expect(data.heartRate).toBeDefined();
-      expect(data.bloodSugar).toBeDefined();
-    } catch (e: any) {
-      console.log('Cannot view exam data details:', e.message);
-    }
+  test('验证主检详情页可访问报告预览', async ({ adminPage }) => {
+    // 导航到主检评估页面并开始主检
+    await adminPage.goto('#/inspectionmanage/general-list');
+    await adminPage.waitForLoadState('networkidle');
+    await adminPage.waitForTimeout(500);
+
+    await adminPage.getByRole('button', { name: '查询' }).click();
+    await adminPage.waitForLoadState('networkidle');
+
+    await adminPage.getByRole('button', { name: '开始主检' }).first().click();
+    await adminPage.waitForLoadState('networkidle');
+    await adminPage.waitForTimeout(1000);
+
+    // 验证报告预览按钮存在（使用精确匹配）
+    const previewBtn = adminPage.getByRole('button', { name: '报告预览', exact: true });
+    await expect(previewBtn).toBeVisible();
   });
 
-  test.skip('验证管理员可从详情页返回列表', async ({ adminPage, draftReport }) => {
-    if (!draftReport) {
-      console.log('跳过测试：没有可用的报告 ID');
-      test.skip();
-      return;
-    }
-    
-    const detailPage = new ReportDetailPage(adminPage);
-    try {
-      await detailPage.goto(draftReport);
-      await detailPage.goBack();
-      const listPage = new ReportListPage(adminPage);
-      await expect(listPage.reportTable).toBeVisible();
-    } catch (e: any) {
-      console.log('Cannot return from detail page:', e.message);
-    }
+  test('验证主检详情页可返回总检列表', async ({ adminPage }) => {
+    // 导航到主检评估页面并开始主检
+    await adminPage.goto('#/inspectionmanage/general-list');
+    await adminPage.waitForLoadState('networkidle');
+    await adminPage.waitForTimeout(500);
+
+    await adminPage.getByRole('button', { name: '查询' }).click();
+    await adminPage.waitForLoadState('networkidle');
+
+    await adminPage.getByRole('button', { name: '开始主检' }).first().click();
+    await adminPage.waitForLoadState('networkidle');
+    await adminPage.waitForTimeout(1000);
+
+    // 点击返回列表按钮
+    const backBtn = adminPage.getByText('返回列表');
+    await expect(backBtn).toBeVisible();
+    await backBtn.click();
+
+    // 等待页面跳转回列表
+    await adminPage.waitForLoadState('networkidle');
+    await adminPage.waitForTimeout(500);
+
+    // 验证 URL 包含总检列表路径
+    await expect(adminPage).toHaveURL(/.*general-list.*/);
   });
 
-  test('验证管理员可创建新报告', async ({ adminPage }) => {
-    const listPage = new ReportListPage(adminPage);
-    await listPage.goto();
-    try {
-      await listPage.clickCreate();
-      const editPage = new ReportEditPage(adminPage);
-      await expect(editPage.patientNameInput).toBeVisible();
-    } catch (e: any) {
-      console.log('Cannot create new report:', e.message);
-    }
+  test('验证主检详情页可执行总检操作（总检按钮存在）', async ({ adminPage }) => {
+    // 导航到主检评估页面并开始主检
+    await adminPage.goto('#/inspectionmanage/general-list');
+    await adminPage.waitForLoadState('networkidle');
+    await adminPage.waitForTimeout(500);
+
+    await adminPage.getByRole('button', { name: '查询' }).click();
+    await adminPage.waitForLoadState('networkidle');
+
+    await adminPage.getByRole('button', { name: '开始主检' }).first().click();
+    await adminPage.waitForLoadState('networkidle');
+    await adminPage.waitForTimeout(1000);
+
+    // 验证总检按钮存在（快捷键 ALT+S）
+    const generalInspectionBtn = adminPage.locator('button:has-text("总检")').first();
+    await expect(generalInspectionBtn).toBeVisible();
   });
 
-  test.skip('验证管理员可编辑草稿报告', async ({ adminPage, draftReport }) => {
-    if (!draftReport) {
-      console.log('跳过测试：没有可用的报告 ID');
-      test.skip();
-      return;
-    }
-    
-    const editPage = new ReportEditPage(adminPage);
-    try {
-      await editPage.goto(draftReport);
-      await editPage.fillExamResults({
-        bloodPressure: '120/80',
-        heartRate: '72',
-        bloodSugar: '5.6',
-        comment: 'Admin updated'
-      });
-      await editPage.save();
-      await expect(editPage.successToast).toBeVisible();
-    } catch (e: any) {
-      console.log('Cannot edit draft report:', e.message);
-    }
+  test('验证完整流程：登录 -> 总检 -> 主检评估 -> 开始主检 -> 查看总检按钮', async ({ adminPage }) => {
+    // 1. 登录 - 已通过 fixture 完成
+
+    // 2. 导航到总检管理页面（点击总检菜单）
+    await adminPage.getByText('总检').click();
+    await adminPage.waitForTimeout(1000);
+
+    // 3. 直接导航到主检评估页面
+    await adminPage.goto('#/inspectionmanage/general-list');
+    await adminPage.waitForLoadState('networkidle');
+    await adminPage.waitForTimeout(500);
+
+    // 4. 查询待评估列表
+    await adminPage.getByRole('button', { name: '查询' }).click();
+    await adminPage.waitForLoadState('networkidle');
+
+    // 5. 开始主检
+    await adminPage.getByRole('button', { name: '开始主检' }).first().click();
+    await adminPage.waitForLoadState('networkidle');
+    await adminPage.waitForTimeout(1000);
+
+    // 6. 验证总检按钮存在且可用
+    const generalInspectionBtn = adminPage.locator('button:has-text("总检")').first();
+    await expect(generalInspectionBtn).toBeVisible();
+
+    // 7. 验证页面包含必要元素
+    await expect(adminPage.locator('text=客户资料')).toBeVisible();
+    await expect(adminPage.getByRole('button', { name: '报告预览', exact: true })).toBeVisible();
+    await expect(adminPage.getByText('返回列表')).toBeVisible();
   });
 
-  test.skip('验证管理员可提交报告审核', async ({ adminPage, draftReport }) => {
-    if (!draftReport) {
-      console.log('跳过测试：没有可用的报告 ID');
-      test.skip();
-      return;
-    }
-    
-    const editPage = new ReportEditPage(adminPage);
-    try {
-      await editPage.goto(draftReport);
-      await editPage.submitForAudit();
-      await expect(editPage.successToast).toBeVisible();
-    } catch (e: any) {
-      console.log('Cannot submit report for audit:', e.message);
-    }
-  });
+  test('验证总检流程：开始主检后可看到总检相关操作', async ({ adminPage }) => {
+    // 导航到主检评估页面
+    await adminPage.goto('#/inspectionmanage/general-list');
+    await adminPage.waitForLoadState('networkidle');
+    await adminPage.waitForTimeout(500);
 
-  test.skip('验证管理员可作废报告', async ({ adminPage, draftReport }) => {
-    if (!draftReport) {
-      console.log('跳过测试：没有可用的报告 ID');
-      test.skip();
-      return;
-    }
-    
-    const detailPage = new ReportDetailPage(adminPage);
-    try {
-      await detailPage.goto(draftReport);
-      await detailPage.clickVoid();
-      const status = await detailPage.getStatus();
-      expect(status).toContain('作废');
-    } catch (e: any) {
-      console.log('Cannot void report:', e.message);
-    }
-  });
+    // 查询数据
+    await adminPage.getByRole('button', { name: '查询' }).click();
+    await adminPage.waitForLoadState('networkidle');
 
-  test('验证管理员可查看分页信息', async ({ adminPage }) => {
-    const listPage = new ReportListPage(adminPage);
-    await listPage.goto();
-    try {
-      await expect(listPage.paginationInfo).toBeVisible();
-    } catch (e: any) {
-      console.log('Pagination info not available:', e.message);
-    }
-  });
+    // 开始主检
+    await adminPage.getByRole('button', { name: '开始主检' }).first().click();
+    await adminPage.waitForLoadState('networkidle');
+    await adminPage.waitForTimeout(1000);
 
-  test('验证管理员搜索不存在患者显示空状态', async ({ adminPage }) => {
-    const listPage = new ReportListPage(adminPage);
-    await listPage.goto();
-    try {
-      await listPage.searchByName('NonExistentPatientNameXYZ');
-      await expect(listPage.emptyState).toBeVisible();
-    } catch (e: any) {
-      console.log('Empty state search not available:', e.message);
-    }
+    // 验证可以看到总检相关操作按钮
+    // 取消总检按钮
+    await expect(adminPage.getByText('取消总检')).toBeVisible();
+
+    // 解锁按钮
+    await expect(adminPage.getByText('解锁')).toBeVisible();
+
+    // 驳回分科按钮
+    await expect(adminPage.getByText('驳回分科')).toBeVisible();
   });
 });
-
